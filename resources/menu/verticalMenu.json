@@ -10,25 +10,25 @@
       "menuHeader": "Kontrol Sistem"
     },
     {
-      "url": "/pump-control",
+      "url": "/sistem-control/pump-control",
       "name": "Kontrol Pompa",
       "icon": "menu-icon icon-base bx bx-water-drop-alt",
-      "slug": "pump-control"
+      "slug": "sistem-pump-control"
     },
     {
-      "url": "/pump-schedule",
+      "url": "/sistem-control/pump-schedule",
       "name": "Penjadwalan Pompa",
       "icon": "menu-icon icon-base bx bx-calendar-alt",
-      "slug": "pump-control"
+      "slug": "sistem-pump-schedule"
     },
     {
       "menuHeader": "Data & Laporan"
     },
     {
-      "url": "page/history-operation",
+      "url": "/sistem-control/pump-history",
       "name": "Riwayat Operasi",
       "icon": "menu-icon icon-base bx bx-history",
-      "slug": "history-operation"
+      "slug": "sistem-pump-history"
     },
     {
       "menuHeader": "Autentikasi"

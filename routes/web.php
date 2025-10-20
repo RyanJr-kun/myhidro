@@ -1,5 +1,7 @@
 <?php
 
+use App\Mail\SendEmail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\layouts\Blank;
 use App\Http\Controllers\layouts\Fluid;
@@ -38,40 +40,41 @@ use App\Http\Controllers\tables\Basic as TablesBasic;
 use App\Http\Controllers\extended_ui\PerfectScrollbar;
 use App\Http\Controllers\pages\AccountSettingsAccount;
 use App\Http\Controllers\authentications\RegisterBasic;
-use App\Http\Controllers\user_interface\TooltipsPopovers;
 use App\Http\Controllers\pages\AccountSettingsSecurity;
-use App\Http\Controllers\authenticatons\ResetPasswordBasic;
+use App\Http\Controllers\sistem_control\PumpController;
+use App\Http\Controllers\user_interface\TooltipsPopovers;
 use App\Http\Controllers\pages\AccountManagementController;
+use App\Http\Controllers\authentications\ResetPasswordBasic;
 use App\Http\Controllers\pages\AccountSettingsNotifications;
-use App\Http\Controllers\authentications\ForgotPasswordBasic;
-use App\Http\Controllers\user_interface\PaginationBreadcrumbs;
 
-use Illuminate\Support\Facades\Mail;
-use App\Mail\SendEmail;
+use App\Http\Controllers\authentications\ForgotPasswordBasic;
+use App\Http\Controllers\sistem_control\PumpHistoryController;
+use App\Http\Controllers\user_interface\PaginationBreadcrumbs;
+use App\Http\Controllers\sistem_control\PumpScheduleController;
 
 // authentication
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('login')->middleware('guest');
 Route::post('/auth/login-basic', [LoginBasic::class, 'authenticate'])->name('login-authenticate');
+
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 Route::post('/auth/register-basic', [RegisterBasic::class, 'store'])->name('auth-register-store');
+//verifi email kalo mau tulis disini
+
 Route::get('/auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('password.request');
 Route::post('forgot-password', [ForgotPasswordBasic::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('reset-password/{token}', [ResetPasswordBasic::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [ResetPasswordBasic::class, 'update'])->name('password.update');
 Route::post('/auth/logout',[LoginBasic::class, 'logout'])->name('logout');
-
-Route::get('/send-email',function(){
-    $data = [
-        'name' => 'Syahrizal As',
-        'body' => 'Testing Kirim Email di Santri Koding'
-    ];
-
-    Mail::to('soliqhuin@gmail.com')->send(new SendEmail($data));
-
-    dd("Email Berhasil dikirim.");
-});
 
 Route::middleware(['auth'])->group(function () {
   Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
+
+  Route::get('/sistem-control/pump-control', [PumpController::class, 'index'])->name('sistem-pump-control');
+  Route::get('/sistem-control/pump-schedule', [PumpScheduleController::class, 'index'])->name('sistem-pump-schedule');
+  Route::get('/sistem-control/pump-history', [PumpHistoryController::class, 'index'])->name('sistem-pump-history');
+  Route::get('/riwayat-pompa/export/excel', [PumpHistoryController::class, 'exportExcel'])->name('kontrol-riwayat-pompa-excel');
+  Route::get('/riwayat-pompa/export/pdf', [PumpHistoryController::class, 'exportPdf'])->name('kontrol-riwayat-pompa-pdf');
+
   Route::get('/pages/account-settings', [AccountSettingsAccount::class, 'index'])->name('account-settings');
   Route::post('/pages/account-settings', [AccountSettingsAccount::class, 'update'])->name('account-settings.update');
   Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('account-settings-notifications');
@@ -79,8 +82,10 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/pages/account-settings-security', [AccountSettingsSecurity::class, 'updatePassword'])->name('account-settings-security.update');
 });
 Route::middleware(['admin', 'auth'])->group(function () {
-
   Route::get('/pages/account-management', [AccountManagementController::class, 'index'])->name('account-management');
+  Route::post('/pages/account-management', [AccountManagementController::class, 'store'])->name('account-management.store');
+  Route::put('/pages/account-management/{id}', [AccountManagementController::class, 'update'])->name('account-management.update');
+  Route::delete('/pages/account-management/{id}', [AccountManagementController::class, 'destroy'])->name('account-management.destroy');
 });
 
 

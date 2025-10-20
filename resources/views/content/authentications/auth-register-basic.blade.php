@@ -54,18 +54,8 @@
                   <div class="d-block invalid-feedback">{{ $message }}</div>
                 @enderror
               </div>
-              {{-- <div class="my-7">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms" />
-                                <label class="form-check-label" for="terms-conditions">
-                                    I agree to
-                                    <a href="javascript:void(0);">privacy policy & terms</a>
-                                </label>
-                            </div>
-                        </div> --}}
               <button class="btn btn-primary d-grid w-100">Sign up</button>
             </form>
-
             <p class="text-center">
               <span>Sudah punya akun?</span>
               <a href="{{ url('auth/login-basic') }}">

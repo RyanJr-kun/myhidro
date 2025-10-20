@@ -24,12 +24,12 @@ class AccountSettingsSecurity extends Controller
     ]);
 
     # Cek apakah password lama cocok
-    if (!Hash::check($request->current_password, auth()->user()->password)) {
+    if (!Hash::check($request->current_password, Auth::user()->password)) {
       return back()->with("error", "Password lama tidak cocok!");
     }
 
     # Update password baru
-    \App\Models\User::whereId(auth()->user()->id)->update([
+    \App\Models\User::whereId(Auth::user()->id)->update([
       'password' => Hash::make($request->new_password)
     ]);
 
