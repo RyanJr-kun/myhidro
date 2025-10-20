@@ -34,10 +34,26 @@
       "menuHeader": "Autentikasi"
     },
     {
-      "url": "pages/account-settings",
-      "name": "Profile",
-      "icon": "menu-icon icon-base bx bx-user",
-      "slug": "account-settings"
+      "name": "Setting",
+      "icon": "menu-icon icon-base bx bx-cog",
+      "slug": "account-settings",
+      "submenu": [
+        {
+          "url": "pages/account-settings",
+          "name": "Profile",
+          "slug": "account-settings"
+        },
+        {
+          "url": "pages/account-settings-notifications",
+          "name": "Notifikasi",
+          "slug": "account-settings-notifications"
+        },
+        {
+          "url": "pages/account-settings-security",
+          "name": "Keamanan",
+          "slug": "account-settings-security"
+        }
+      ]
     },
     {
       "url": "pages/account-management",
@@ -203,9 +219,9 @@
           "slug": "pages-account-settings-notifications"
         },
         {
-          "url": "pages/account-settings-connections",
+          "url": "pages/account-settings-security",
           "name": "Connections",
-          "slug": "pages-account-settings-connections"
+          "slug": "account-settings-security"
         }
       ]
     },

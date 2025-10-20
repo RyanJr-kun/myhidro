@@ -1,63 +1,85 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\layouts\Blank;
+use App\Http\Controllers\layouts\Fluid;
+use App\Http\Controllers\icons\Boxicons;
+use App\Http\Controllers\cards\CardBasic;
+use App\Http\Controllers\pages\MiscError;
+use App\Http\Controllers\layouts\Container;
 use App\Http\Controllers\dashboard\Analytics;
 use App\Http\Controllers\layouts\WithoutMenu;
 use App\Http\Controllers\layouts\WithoutNavbar;
-use App\Http\Controllers\layouts\Fluid;
-use App\Http\Controllers\layouts\Container;
-use App\Http\Controllers\layouts\Blank;
-use App\Http\Controllers\pages\AccountSettingsAccount;
-use App\Http\Controllers\pages\AccountSettingsNotifications;
-use App\Http\Controllers\pages\AccountSettingsConnections;
-use App\Http\Controllers\pages\MiscError;
-use App\Http\Controllers\pages\AccountManagementController;
-use App\Http\Controllers\pages\MiscUnderMaintenance;
-use App\Http\Controllers\authentications\LoginBasic;
-use App\Http\Controllers\authentications\RegisterBasic;
-use App\Http\Controllers\authentications\ForgotPasswordBasic;
-use App\Http\Controllers\cards\CardBasic;
-use App\Http\Controllers\user_interface\Accordion;
 use App\Http\Controllers\user_interface\Alerts;
 use App\Http\Controllers\user_interface\Badges;
-use App\Http\Controllers\user_interface\Buttons;
-use App\Http\Controllers\user_interface\Carousel;
-use App\Http\Controllers\user_interface\Collapse;
-use App\Http\Controllers\user_interface\Dropdowns;
 use App\Http\Controllers\user_interface\Footer;
-use App\Http\Controllers\user_interface\ListGroups;
 use App\Http\Controllers\user_interface\Modals;
 use App\Http\Controllers\user_interface\Navbar;
-use App\Http\Controllers\user_interface\Offcanvas;
-use App\Http\Controllers\user_interface\PaginationBreadcrumbs;
+use App\Http\Controllers\user_interface\Toasts;
+use App\Http\Controllers\user_interface\Buttons;
+use App\Http\Controllers\extended_ui\TextDivider;
+use App\Http\Controllers\user_interface\Carousel;
+use App\Http\Controllers\user_interface\Collapse;
 use App\Http\Controllers\user_interface\Progress;
 use App\Http\Controllers\user_interface\Spinners;
-use App\Http\Controllers\user_interface\TabsPills;
-use App\Http\Controllers\user_interface\Toasts;
-use App\Http\Controllers\user_interface\TooltipsPopovers;
-use App\Http\Controllers\user_interface\Typography;
-use App\Http\Controllers\extended_ui\PerfectScrollbar;
-use App\Http\Controllers\extended_ui\TextDivider;
-use App\Http\Controllers\icons\Boxicons;
 use App\Http\Controllers\form_elements\BasicInput;
+use App\Http\Controllers\user_interface\Accordion;
+use App\Http\Controllers\user_interface\Dropdowns;
+use App\Http\Controllers\user_interface\Offcanvas;
+use App\Http\Controllers\user_interface\TabsPills;
 use App\Http\Controllers\form_elements\InputGroups;
 use App\Http\Controllers\form_layouts\VerticalForm;
+use App\Http\Controllers\user_interface\ListGroups;
+use App\Http\Controllers\user_interface\Typography;
+use App\Http\Controllers\authentications\LoginBasic;
+use App\Http\Controllers\pages\MiscUnderMaintenance;
 use App\Http\Controllers\form_layouts\HorizontalForm;
 use App\Http\Controllers\tables\Basic as TablesBasic;
+use App\Http\Controllers\extended_ui\PerfectScrollbar;
+use App\Http\Controllers\pages\AccountSettingsAccount;
+use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\user_interface\TooltipsPopovers;
+use App\Http\Controllers\pages\AccountSettingsSecurity;
+use App\Http\Controllers\authenticatons\ResetPasswordBasic;
+use App\Http\Controllers\pages\AccountManagementController;
+use App\Http\Controllers\pages\AccountSettingsNotifications;
+use App\Http\Controllers\authentications\ForgotPasswordBasic;
+use App\Http\Controllers\user_interface\PaginationBreadcrumbs;
+
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmail;
 
 // authentication
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('login')->middleware('guest');
 Route::post('/auth/login-basic', [LoginBasic::class, 'authenticate'])->name('login-authenticate');
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 Route::post('/auth/register-basic', [RegisterBasic::class, 'store'])->name('auth-register-store');
-Route::get('/auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('auth-reset-password-basic');
+Route::get('/auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordBasic::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [ResetPasswordBasic::class, 'showResetForm'])->name('password.reset');
 Route::post('/auth/logout',[LoginBasic::class, 'logout'])->name('logout');
+
+Route::get('/send-email',function(){
+    $data = [
+        'name' => 'Syahrizal As',
+        'body' => 'Testing Kirim Email di Santri Koding'
+    ];
+
+    Mail::to('soliqhuin@gmail.com')->send(new SendEmail($data));
+
+    dd("Email Berhasil dikirim.");
+});
 
 Route::middleware(['auth'])->group(function () {
   Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
-
+  Route::get('/pages/account-settings', [AccountSettingsAccount::class, 'index'])->name('account-settings');
+  Route::post('/pages/account-settings', [AccountSettingsAccount::class, 'update'])->name('account-settings.update');
+  Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('account-settings-notifications');
+  Route::get('/pages/account-settings-security', [AccountSettingsSecurity::class, 'index'])->name('account-settings-security');
+  Route::post('/pages/account-settings-security', [AccountSettingsSecurity::class, 'updatePassword'])->name('account-settings-security.update');
 });
 Route::middleware(['admin', 'auth'])->group(function () {
+
   Route::get('/pages/account-management', [AccountManagementController::class, 'index'])->name('account-management');
 });
 
@@ -71,9 +93,6 @@ Route::get('/layouts/container', [Container::class, 'index'])->name('layouts-con
 Route::get('/layouts/blank', [Blank::class, 'index'])->name('layouts-blank');
 
 // pages
-Route::get('/pages/account-settings', [AccountSettingsAccount::class, 'index'])->name('account-settings');
-Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');
-Route::get('/pages/account-settings-connections', [AccountSettingsConnections::class, 'index'])->name('pages-account-settings-connections');
 Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
 
 Route::get('/pages/misc-under-maintenance', [MiscUnderMaintenance::class, 'index'])->name('pages-misc-under-maintenance');

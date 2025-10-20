@@ -36,7 +36,7 @@
     <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown me-2 me-xl-0">
       <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown"
         data-bs-auto-close="outside" aria-expanded="false">
-        <i class="icon-base bx bx-grid-alt icon-md"></i>
+        <i class="icon-base bx bx-grid icon-md"></i>
       </a>
       <div class="dropdown-menu dropdown-menu-end p-0">
         <div class="dropdown-menu-header border-bottom">
@@ -97,7 +97,7 @@
               <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                 <i class="icon-base bx bx-cog icon-26px text-heading"></i>
               </span>
-              <a href="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/pages/account-settings"
+              <a href="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/pages/account-settings-account"
                 class="stretched-link">Setting</a>
               <small>Account Settings</small>
             </div>
@@ -374,26 +374,25 @@
       <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
         <div class="avatar avatar-online">
           <img
-            src="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo/assets/img/avatars/1.png"
+            src="{{ $user->img_user ? asset('assets/img/users/' . $user->img_user) : asset('assets/img/avatars/1.png') }}"
             alt="" class="rounded-circle">
         </div>
       </a>
       <ul class="dropdown-menu dropdown-menu-end">
         @if (Auth::check())
           <li>
-            <a class="dropdown-item"
-              href="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/pages/profile-user">
+            <a class="dropdown-item" href="{{ route('account-settings') }}">
               <div class="d-flex">
                 <div class="flex-shrink-0 me-3">
                   <div class="avatar avatar-online">
                     <img
-                      src="{{ Auth::user()->img_user ? asset('storage/' . Auth::user()->img_user) : 'https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo/assets/img/avatars/1.png' }}"
+                      src="{{ $user->img_user ? asset('assets/img/users/' . $user->img_user) : asset('assets/img/avatars/1.png') }}"
                       alt="Profile" class="w-px-40 h-auto rounded-circle">
                   </div>
                 </div>
                 <div class="flex-grow-1">
-                  <h6 class="mb-0">{{ Auth::user()->name }}</h6>
-                  <small class="text-body-secondary">{{ Auth::user()->role->nama }}</small>
+                  <h6 class="mb-0">{{ $user->name }}</h6>
+                  <small class="text-body-secondary">{{ $user->role->nama }}</small>
                 </div>
               </div>
             </a>

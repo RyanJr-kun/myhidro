@@ -9,15 +9,15 @@
         <ul class="nav nav-pills flex-column flex-md-row mb-6 gap-md-0 gap-2">
           <li class="nav-item">
             <a class="nav-link" href="{{ url('pages/account-settings') }}"><i
-                class="icon-base bx bx-user icon-sm me-1_5"></i> Account</a>
+                class="icon-base bx bx-user icon-sm me-1_5"></i> Profile</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" href="javascript:void(0);"><i class="icon-base bx bx-bell icon-sm me-1_5"></i>
-              Notifications</a>
+              Notifikasi</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url('pages/account-settings-connections') }}"><i
-                class="icon-base bx bx-link-alt icon-sm me-1_5"></i> Connections</a>
+            <a class="nav-link" href="{{ url('pages/account-settings-security') }}"><i
+                class="icon-base bx bx-shield icon-sm me-1_5"></i> Keamanan</a>
           </li>
         </ul>
       </div>
