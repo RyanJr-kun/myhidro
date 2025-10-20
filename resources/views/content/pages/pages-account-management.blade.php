@@ -14,9 +14,9 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Id</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Role</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -28,7 +28,15 @@
                 <span class="fw-medium">{{ $user->name }}</span>
               </td>
               <td>{{ $user->email }}</td>
+              <td>
+                  @if ($user->role->id == 1)
+                    <span class="badge bg-primary" title="Role user">{{ $user->role->nama }}</span>
+                  @else
+                    <span class="badge bg-info" title="Role user">{{ $user->role->nama }}</span>
+                  @endif
+              </td>
               <td><span class="badge bg-label-primary me-1">Active</span></td>
+
               <td>
                 <div class="dropdown">
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i

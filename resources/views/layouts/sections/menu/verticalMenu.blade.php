@@ -1,5 +1,6 @@
 @php
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Gate;
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 
@@ -21,7 +22,8 @@ use Illuminate\Support\Facades\Route;
     <ul class="menu-inner py-1">
         @foreach ($menuData[0]->menu as $menu)
 
-        {{-- adding active and open class if child is active --}}
+        {{-- Check for 'can' permission --}}
+        @if (!isset($menu->can) || Gate::check($menu->can))
 
         {{-- menu headers --}}
         @if (isset($menu->menuHeader))
@@ -71,6 +73,7 @@ use Illuminate\Support\Facades\Route;
             @include('layouts.sections.menu.submenu',['menu' => $menu->submenu])
             @endisset
         </li>
+        @endif
         @endif
         @endforeach
     </ul>

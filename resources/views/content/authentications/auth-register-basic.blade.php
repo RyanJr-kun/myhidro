@@ -29,15 +29,15 @@
               <div class="mb-6">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control @error('username') is-invalid @enderror" id="username"
-                  name="username" placeholder="Enter your username" value="{{ old('username') }}" autofocus />
+                  name="username" placeholder="Masukkan username Anda" value="{{ old('username') }}" autofocus />
                 @error('username')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
               </div>
               <div class="mb-6">
                 <label for="email" class="form-label">Email</label>
-                <input type="text" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
-                  placeholder="Enter your email" value="{{ old('email') }}" />
+                <input type="text" class="form-control @error('email') is-invalid @enderror" id="email"
+                  name="email" placeholder="Masukkan email Anda" value="{{ old('email') }}" />
                 @error('email')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -46,8 +46,7 @@
                 <label class="form-label" for="password">Password</label>
                 <div class="input-group input-group-merge">
                   <input type="password" id="password" class="form-control @error('password') is-invalid @enderror"
-                    name="password"
-                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                    name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                     aria-describedby="password" autocomplete="new-password" />
                   <span class="input-group-text cursor-pointer"><i class="icon-base bx bx-hide"></i></span>
                 </div>

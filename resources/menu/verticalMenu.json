@@ -3,7 +3,7 @@
     {
       "url": "/",
       "name": "Dashboards",
-      "icon": "menu-icon icon-base bx bx-home-smile",
+      "icon": "menu-icon icon-base bx bx-dashboard",
       "slug": "dashboard-analytics"
     },
     {
@@ -12,13 +12,13 @@
     {
       "url": "/pump-control",
       "name": "Kontrol Pompa",
-      "icon": "menu-icon icon-base bx bx-droplet",
+      "icon": "menu-icon icon-base bx bx-water-drop-alt",
       "slug": "pump-control"
     },
     {
       "url": "/pump-schedule",
       "name": "Penjadwalan Pompa",
-      "icon": "menu-icon icon-base bx bx-calendar",
+      "icon": "menu-icon icon-base bx bx-calendar-alt",
       "slug": "pump-control"
     },
     {
@@ -34,16 +34,17 @@
       "menuHeader": "Autentikasi"
     },
     {
-      "url": "pages/account-settings-account",
+      "url": "pages/account-settings",
       "name": "Profile",
       "icon": "menu-icon icon-base bx bx-user",
       "slug": "account-settings"
     },
     {
-      "url": "page/account-management",
+      "url": "pages/account-management",
       "name": "Pengguna",
       "icon": "menu-icon icon-base bx bx-shield",
-      "slug": "account-management"
+      "slug": "account-management",
+      "can": "is_admin"
     },
     {
       "menuHeader": "kebawah itu template"
@@ -192,9 +193,9 @@
       "slug": "pages-account-settings",
       "submenu": [
         {
-          "url": "pages/account-settings-account",
+          "url": "pages/account-settings",
           "name": "Account",
-          "slug": "pages-account-settings-account"
+          "slug": "pages-account-settings"
         },
         {
           "url": "pages/account-settings-notifications",
@@ -216,7 +217,7 @@
         {
           "url": "auth/login-basic",
           "name": "Login",
-          "slug": "auth-login-basic",
+          "slug": "login",
           "target": "_blank"
         },
         {

@@ -24,7 +24,8 @@
                     <h4 class="mb-1">Welcome to {{ config('variables.templateName') }}! 👋</h4>
                     <p class="mb-6">Please sign-in to your account and start the adventure</p>
 
-                    <form id="formAuthentication" class="mb-6" action="{{ url('/') }}" method="GET">
+                    <form id="formAuthentication" class="mb-6" action="{{ route('login-authenticate') }}" method="post">
+                        @csrf
                         <div class="mb-6">
                             <label for="email" class="form-label">Email or Username</label>
                             <input type="text" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus />

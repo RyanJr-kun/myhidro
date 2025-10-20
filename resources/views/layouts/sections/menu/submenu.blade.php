@@ -1,11 +1,14 @@
 @php
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Gate;
 @endphp
 
 <ul class="menu-sub">
   @if (isset($menu))
     @foreach ($menu as $submenu)
 
+    {{-- Check for 'can' permission --}}
+    @if (!isset($submenu->can) || Gate::check($submenu->can))
     {{-- active menu method --}}
     @php
       $activeClass = null;
@@ -47,6 +50,7 @@ use Illuminate\Support\Facades\Route;
           @include('layouts.sections.menu.submenu',['menu' => $submenu->submenu])
         @endif
       </li>
+      @endif
     @endforeach
   @endif
 </ul>
