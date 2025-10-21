@@ -17,7 +17,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->integer('duration_minutes');
             $table->json('days');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

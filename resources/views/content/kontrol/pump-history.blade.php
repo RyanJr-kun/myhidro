@@ -3,11 +3,11 @@
 @section('title', 'Riwayat Pompa')
 
 @section('vendor-style')
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endsection
 
 @section('vendor-script')
-<script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 @endsection
 
 @section('content')
@@ -41,6 +41,31 @@
   </div>
 </div>
 
+@if($days > 0)
+<div class="card mb-4">
+  <h5 class="card-header">Estimasi Pemakaian Listrik</h5>
+  <div class="card-body">
+    <p>Estimasi untuk rentang waktu **{{ $days }} hari** (sesuai filter tanggal Anda):</p>
+    <div class="row">
+      <div class="col-md-6">
+        <h6 class="text-primary">Total Pemakaian Energi</h6>
+        <h3>{{ number_format($totalEnergyKWh, 2, ',', '.') }} <small>kWh</small></h3>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-success">Estimasi Total Biaya</h6>
+        <h3>Rp {{ number_format($totalCost, 0, ',', '.') }}</h3>
+        <small>(biaya Rp 1.444 per kWh)</small>
+      </div>
+    </div>
+  </div>
+</div>
+@else
+<div class="alert alert-info mb-4" role="alert">
+  <h6 class="alert-heading mb-1">Info Laporan Listrik</h6>
+  <span>Silakan pilih **rentang waktu** pada filter untuk melihat estimasi pemakaian listrik.</span>
+</div>
+@endif
+
 <!-- Card Tabel Riwayat -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
@@ -56,9 +81,10 @@
         <tr>
           <th>No</th>
           <th>Nama Pompa</th>
-          <th>Status</th>
           <th>Pemicu</th>
-          <th>Waktu</th>
+          <th>Waktu Mulai</th>
+          <th>Waktu Selesai</th>
+          <th>Durasi</th>
         </tr>
       </thead>
       <tbody class="table-border-bottom-0">
@@ -66,19 +92,35 @@
         <tr>
           <td>{{ $loop->iteration + $histories->firstItem() - 1 }}</td>
           <td>{{ $history->pump_name }}</td>
+          <td>{{ ucfirst($history->triggered_by) }}</td>
+
+          {{-- Ini adalah perbaikan untuk error Anda --}}
           <td>
-            @if($history->status == 'ON')
-            <span class="badge bg-label-success">ON</span>
+            {{ $history->start_time ? $history->start_time->format('d M Y, H:i:s') : 'N/A' }}
+          </td>
+
+          <td>
+            {{-- Tampilkan end_time HANYA jika sudah ada --}}
+            @if($history->end_time)
+              {{ $history->end_time->format('d M Y, H:i:s') }}
             @else
-            <span class="badge bg-label-secondary">OFF</span>
+              <span class="badge bg-label-success">Sedang Berjalan</span>
             @endif
           </td>
-          <td>{{ ucfirst($history->triggered_by) }}</td>
-          <td>{{ $history->created_at->format('d M Y, H:i:s') }}</td>
+
+          <td>
+            {{-- Tampilkan durasi HANYA jika sudah selesai --}}
+            @if($history->duration_in_seconds)
+              {{ gmdate('H:i:s', $history->duration_in_seconds) }}
+              <small class="text-muted">({{ $history->duration_in_seconds }} dtk)</small>
+            @else
+              -
+            @endif
+          </td>
         </tr>
         @empty
         <tr>
-          <td colspan="5" class="text-center">Tidak ada data riwayat.</td>
+          <td colspan="6" class="text-center">Tidak ada data riwayat.</td>
         </tr>
         @endforelse
       </tbody>

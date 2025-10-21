@@ -29,12 +29,10 @@ class PumpScheduleController extends Controller
             'duration_minutes' => 'required|integer|min:1',
             'days' => 'required|array',
             'days.*' => 'string',
-            'is_active' => 'nullable|boolean',
+            'status' => 'nullable|boolean',
         ]);
 
-        $validatedData['is_active'] = $request->has('is_active');
         PumpSchedule::create($validatedData);
-
         return response()->json(['success' => 'Jadwal pompa berhasil disimpan!']);
     }
 
@@ -43,6 +41,28 @@ class PumpScheduleController extends Controller
      */
     public function destroy(PumpSchedule $pumpSchedule)
     {
-        //
+        try {
+            $pumpSchedule->delete();
+            return response()->json(['success' => 'Jadwal berhasil dihapus.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal menghapus jadwal.'], 500);
+        }
+    }
+
+    public function toggleStatus(PumpSchedule $pumpSchedule)
+    {
+        try {
+            $pumpSchedule->status = !$pumpSchedule->status;
+            $pumpSchedule->save();
+
+            $statusText = $pumpSchedule->status ? 'diaktifkan' : 'dinonaktifkan';
+            return response()->json([
+                'success' => "Jadwal berhasil {$statusText}.",
+                'new_status' => $pumpSchedule->status
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal mengubah status jadwal.'], 500);
+        }
     }
   }

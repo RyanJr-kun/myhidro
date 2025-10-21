@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\sistem_control\Pump;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Models\sistem_control\PumpHistory;
 
 class PumpController extends Controller
 {
@@ -35,13 +36,32 @@ class PumpController extends Controller
             $pump->status = $request->status;
             $pump->save();
 
+            if ($pump->status == true) {
+                PumpHistory::create([
+                    'pump_name' => $pump->name,
+                    'triggered_by' => 'Manual',
+                    'end_time' => null,
+                    'duration_in_seconds' => null
+                ]);
+            } else {
+                $history = PumpHistory::where('pump_name', $pump->name)
+                                    ->whereNull('end_time')
+                                    ->latest('start_time')
+                                    ->first();
+                if ($history) {
+                    $history->end_time = now();
+                    $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                    $history->save();
+                }
+            }
+
             $statusText = $pump->status ? 'dinyalakan' : 'dimatikan';
             return response()->json([
                 'success' => true,
-                'message' => "{$pump->name} berhasil {$statusText}."
+                'message' => "Status {$pump->name} berhasil diubah menjadi {$statusText}."
             ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status pompa di database.'], 500);
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status pompa di database: ' . $e->getMessage()], 500);
         }
     }
 }

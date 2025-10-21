@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('pump_histories', function (Blueprint $table) {
             $table->id();
             $table->string('pump_name');
-            $table->enum('status', ['ON', 'OFF']);
             $table->enum('triggered_by', ['Manual','Otomatis']);
+            $table->enum('status', ['ON', 'OFF']);
             $table->timestamps();
         });
     }

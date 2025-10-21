@@ -19,19 +19,16 @@ use App\Http\Controllers\sistem_control\PumpScheduleController;
 use App\Http\Middleware\VerifyDeviceToken;
 
 Route::middleware('auth:sanctum')->group(function () {
-    // 1. Menggantikan Page/GetPumpStatus.php
     Route::get('/pump/status', [PumpApiController::class, 'getManualStatusForWeb']);
-    // 2. Menggantikan Page/ApiKontrolPompaweb.php
     Route::post('/pump/toggle', [PumpApiController::class, 'togglePumpStatus']);
 });
 
 // --- Rute untuk NodeMCU/Arduino ---
 // Rute ini diamankan dengan token khusus
 Route::middleware(VerifyDeviceToken::class)->group(function () {
-    // 3. Menggantikan Hidroponik/ApiKontrolPompaArduino.php
-    Route::get('/arduino/pump-status', [PumpApiController::class, 'getManualStatusForArduino']);
-    // 4. Menggantikan Hidroponik/GetJadwalArduino.php
-    Route::get('/arduino/schedules', [PumpApiController::class, 'getSchedulesForArduino']);
+    Route::get('/arduino/get-desired-states', [PumpApiController::class, 'getDesiredStates']);
+    Route::post('/arduino/log-action', [PumpApiController::class, 'logArduinoPumpAction']);
+
 });
 
 // authentication
@@ -61,10 +58,15 @@ Route::middleware(['auth'])->group(function () {
     'create' => 'ikan.create',
     'store' => 'ikan.store'
   ]);
+
   Route::get('/sistem-control/pump-control', [PumpController::class, 'index'])->name('sistem-pump-control');
   Route::post('/sistem-control/pump-status/{pump}', [PumpController::class, 'updateStatus'])->name('sistem-pump-status');
+
   Route::get('/sistem-control/pump-schedule', [PumpScheduleController::class, 'index'])->name('sistem-pump-schedule');
   Route::post('/sistem-control/pump-schedule', [PumpScheduleController::class, 'store'])->name('sistem-pump-schedule.store');
+  Route::delete('/sistem-control/pump-schedule/{pumpSchedule}', [PumpScheduleController::class, 'destroy'])->name('sistem-pump-schedule.destroy');
+  Route::patch('/sistem-control/pump-schedule/{pumpSchedule}/toggle-status', [PumpScheduleController::class, 'toggleStatus'])->name('sistem-pump-schedule.toggleStatus');
+
   Route::get('/sistem-control/pump-history', [PumpHistoryController::class, 'index'])->name('sistem-pump-history');
   Route::get('/riwayat-pompa/export/excel', [PumpHistoryController::class, 'exportExcel'])->name('kontrol-riwayat-pompa-excel');
   Route::get('/riwayat-pompa/export/pdf', [PumpHistoryController::class, 'exportPdf'])->name('kontrol-riwayat-pompa-pdf');

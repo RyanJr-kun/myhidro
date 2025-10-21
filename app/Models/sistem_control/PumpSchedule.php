@@ -15,7 +15,7 @@ class PumpSchedule extends Model
     'start_time',
     'duration_minutes',
     'days',
-    'is_active',
+    'status',
   ];
   protected $casts = ['days' => 'array'];
 

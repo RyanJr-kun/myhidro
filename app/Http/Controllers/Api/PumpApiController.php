@@ -2,46 +2,112 @@
 
 namespace App\Http\Controllers\Api;
 
-use Carbon\Carbon;
-use App\Models\sistem_control\PumpHistory;
-use App\Models\sistem_control\PumpSchedule;
-use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\DB;
-use App\Models\sistem_control\Pump;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\sistem_control\Pump;
+use App\Models\sistem_control\PumpSchedule;
+use App\Models\sistem_control\PumpHistory;
+use Carbon\Carbon;
 
 class PumpApiController extends Controller
 {
-    // 1. Pengganti Page/GetPumpStatus.php
+    /**
+     *
+     * Mengirim status pompa yang seharusnya ke NodeMCU.
+     */
+    public function getDesiredStates(Request $request)
+    {
+        $now = Carbon::now();
+        $currentDay = (string)$now->dayOfWeek;
+        $currentTime = $now->format('H:i:s');
+        $manualStates = Pump::all()->pluck('status', 'name')->toArray();
+
+        $automaticStates = [];
+        $activeSchedules = PumpSchedule::where('is_active', true)
+                            ->where(function ($query) use ($currentDay) {
+                                $query->whereJsonContains('days', $currentDay)
+                                      ->orWhereJsonContains('days', 'everyday');
+                            })->get();
+
+        foreach ($activeSchedules as $schedule) {
+            $startTime = $schedule->start_time;
+            $endTime = Carbon::parse($schedule->start_time)
+                             ->addMinutes($schedule->duration_minutes)
+                             ->format('H:i:s');
+
+            // Jika waktu sekarang berada di dalam rentang jadwal
+            if ($currentTime >= $startTime && $currentTime <= $endTime) {
+                $automaticStates[$schedule->pump_name] = true; // Harusnya ON
+            }
+        }
+
+        $allPumpNames = ['Pompa Tandon', 'Pompa Kolam', 'Pompa Buang'];
+        $finalStates = [];
+
+        foreach ($allPumpNames as $pumpName) {
+            $isManualOn = $manualStates[$pumpName] ?? false;
+            $isAutomaticOn = $automaticStates[$pumpName] ?? false;
+
+            // Status final adalah true (ON) jika salah satunya true
+            $finalStates[$pumpName] = $isManualOn || $isAutomaticOn;
+        }
+
+        return response()->json([
+            'success' => true,
+            'desired_states' => $finalStates, // Misal: {'Pompa Tandon': true, 'Pompa Kolam': false}
+            'timestamp' => $now
+        ]);
+    }
+
+    public function logArduinoPumpAction(Request $request)
+    {
+        $validated = $request->validate([
+            'pump_name' => 'required|string',
+            'status'    => 'required|in:ON,OFF', // NodeMCU lapor pakai string ON/OFF
+        ]);
+
+        try {
+            $pumpName = $validated['pump_name'];
+
+            if ($validated['status'] == 'ON') {
+                PumpHistory::create([
+                    'pump_name'    => $pumpName,
+                    'triggered_by' => 'Otomatis',
+                    'end_time' => null,
+                    'duration_in_seconds' => null
+                ]);
+            } else {
+                // Pompa baru saja Dimatikan
+                $history = PumpHistory::where('pump_name', $pumpName)
+                                    ->where('triggered_by', 'Otomatis')
+                                    ->whereNull('end_time') // Cari log 'ON' yang belum 'OFF'
+                                    ->latest('start_time')
+                                    ->first();
+
+                if ($history) {
+                    $history->end_time = now();
+                    $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                    $history->save();
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Log received']);
+
+        } catch (\Exception $e) {
+          return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
     public function getManualStatusForWeb(Request $request)
     {
-        // Validasi login sudah dihandle oleh middleware 'auth:sanctum'
-        return $this->getPumpStatus();
-    }
-
-    // 2. Pengganti Hidroponik/ApiKontrolPompaArduino.php
-    public function getManualStatusForArduino(Request $request)
-    {
-        // Validasi token sudah dihandle oleh middleware VerifyDeviceToken
-        return $this->getPumpStatus();
-    }
-
-    // Fungsi helper (digunakan oleh 2 method di atas)
-    private function getPumpStatus()
-    {
-        $defaultPumps = ['pompa_hidroponik', 'pompa_ikan', 'pompa_tanaman'];
-
-        $pumps = Pump::where('aktif', 1)
-                    ->whereIn('nama_pompa', $defaultPumps)
-                    ->get()
-                    ->keyBy('nama_pompa'); // Jadikan 'nama_pompa' sebagai key
+        $manualStates = Pump::all()->pluck('status', 'name')->toArray();
+        $allPumpNames = ['Pompa Tandon', 'Pompa Kolam', 'Pompa Buang']; // Sesuaikan
 
         $pumpData = [];
-        foreach ($defaultPumps as $pump) {
+        foreach ($allPumpNames as $pump) {
             $pumpData[$pump] = [
-                'status' => $pumps->has($pump) ? (int)$pumps[$pump]->status : 0
+                'status' => (int)($manualStates[$pump] ?? 0)
             ];
         }
 
@@ -51,72 +117,64 @@ class PumpApiController extends Controller
             'timestamp' => now()
         ]);
     }
-    
+
     public function togglePumpStatus(Request $request)
     {
-        $request->validate([
-            'pump' => 'required|string|in:pompa_hidroponik,pompa_ikan,pompa_tanaman',
+        $validated = $request->validate([
+            // Asumsi frontend mengirim 'pump_name'
+            'pump_name' => 'required|string|in:Pompa Tandon,Pompa Kolam,Pompa Buang',
+            // Anda mungkin juga ingin mengirim 'status' (true/false) dari frontend
+            // agar cocok dengan 'PumpController@updateStatus'
+            // 'status' => 'required|boolean'
         ]);
 
-        $pumpName = $request->pump;
-        $userId = Auth::id();
+        $pumpName = $validated['pump_name'];
+        $userId = Auth::id(); // Ambil ID user yang login
 
-        try {
-            DB::beginTransaction();
-
-            $pump = Pump::firstOrCreate(
-                ['nama_pompa' => $pumpName],
-                ['status' => 0, 'aktif' => 1, 'diperbarui_oleh' => $userId]
-            );
-
-            $newStatus = !$pump->status;
-
-            $pump->status = $newStatus;
-            $pump->diperbarui_oleh = $userId;
-            $pump->updated_at = now();
-            $pump->aktif = 1;
-            $pump->save();
-
-            // 3. Log ke riwayat
-            $actionType = $newStatus ? 'manual_nyala' : 'manual_mati';
-            $keterangan = 'Pompa ' . ($newStatus ? 'dinyalakan' : 'dimatikan') . ' secara manual dari web';
-
-            PumpHistory::create([
-                'nama_pompa' => $pumpName,
-                'aksi' => $actionType,
-                'id_pengguna' => $userId,
-                'keterangan' => $keterangan,
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'status' => $newStatus,
-                'message' => 'Status pompa berhasil diubah'
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
+        $pump = Pump::where('name', $pumpName)->first();
+        if (!$pump) {
+            return response()->json(['success' => false, 'message' => 'Pompa tidak ditemukan.'], 404);
         }
-    }
 
-    public function getSchedulesForArduino(Request $request)
-    {
-        $schedules = PumpSchedule::where('status', 'aktif')
-            ->orderByRaw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu', 'Setiap Hari')")
-            ->orderBy('waktu_mulai')
-            ->get(['nama_pompa', 'waktu_mulai', 'waktu_selesai', 'hari', 'status']);
+        // --- Logika Toggle ---
+        // Jika frontend mengirim status spesifik:
+        // $newStatus = $validated['status'];
 
+        // Jika frontend hanya mengirim "toggle", maka kita balik statusnya:
+        $newStatus = !$pump->status;
+        // --- Selesai Logika Toggle ---
+
+        $pump->status = $newStatus;
+        $pump->save();
+
+        // --- LOGIKA PENCATATAN RIWAYAT (MASALAH 2A) ---
+        if ($newStatus == true) { // Baru dinyalakan
+            PumpHistory::create([
+                'pump_name'    => $pumpName,
+                'triggered_by' => 'Manual',
+                'end_time' => null,
+                'duration_in_seconds' => null
+            ]);
+        } else { // Baru dimatikan
+            $history = PumpHistory::where('pump_name', $pumpName)
+                                ->where('triggered_by', 'Manual')
+                                ->whereNull('end_time')
+                                ->latest('start_time')
+                                ->first();
+
+            if ($history) {
+                $history->end_time = now();
+                $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                $history->save();
+            }
+        }
+        // --- LOGIKA RIWAYAT SELESAI ---
+
+        $statusText = $newStatus ? 'dinyalakan' : 'dimatikan';
         return response()->json([
             'success' => true,
-            'data' => $schedules,
-            'total' => $schedules->count(),
-            'timestamp' => now()
+            'message' => "Status {$pumpName} berhasil diubah menjadi {$statusText}.",
+            'new_status' => $newStatus
         ]);
     }
 }

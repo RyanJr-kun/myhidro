@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\sistem_control;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\PumpHistoryExport;
 use App\Http\Controllers\Controller;
@@ -19,22 +20,55 @@ class PumpHistoryController extends Controller
         $filterEndDate = $request->input('end_date');
 
         // Query dasar
-        $query = PumpHistory::query()->latest();
+        $query = PumpHistory::query()->latest('start_time');
 
         // Terapkan filter jika ada
         if ($filterPump) {
             $query->where('pump_name', $filterPump);
         }
-
         if ($filterStartDate && $filterEndDate) {
-            $query->whereBetween('created_at', [$filterStartDate . ' 00:00:00', $filterEndDate . ' 23:59:59']);
+            $query->whereBetween('start_time', [$filterStartDate . ' 00:00:00', $filterEndDate . ' 23:59:59']);
         }
 
-        $histories = $query->paginate(10)->withQueryString();
+        $wattNodeMCU = 1.5;
+        $wattRelayModuleStandby = 3;
 
+        $wattPompa = 5;
+        $wattRelayCoilActive = 0.5;
+
+        $wattKonstan = $wattNodeMCU + $wattRelayModuleStandby;
+
+        $totalConstantEnergyWh = 0;
+        $days = 0;
+        if ($filterStartDate && $filterEndDate) {
+             $start = new Carbon($filterStartDate);
+             $end = new Carbon($filterEndDate);
+             $days = $start->diffInDays($end) + 1;
+             $totalConstantEnergyWh = ($wattKonstan * 24) * $days;
+        }
+
+        $wattVariabel = $wattPompa + $wattRelayCoilActive;
+
+        $queryForCalc = clone $query;
+        $totalDurationDetik = (clone $queryForCalc)->sum('duration_in_seconds');
+        $totalDurationJam = $totalDurationDetik / 3600;
+        $totalPumpEnergyWh = $totalDurationJam * $wattVariabel;
+        $totalEnergyWh = $totalPumpEnergyWh + $totalConstantEnergyWh;
+
+        $totalEnergyKWh = $totalEnergyWh / 1000;
+        $costPerKWh = 1444;
+        $totalCost = $totalEnergyKWh * $costPerKWh;
+
+        $histories = $query->paginate(10)->withQueryString();
         $pumpOptions = ['Pompa Tandon', 'Pompa Kolam', 'Pompa Pembuangan'];
 
-        return view('content.kontrol.pump-history', compact('histories', 'pumpOptions'));
+        return view('content.kontrol.pump-history',compact(
+            'histories',
+            'pumpOptions',
+            'totalEnergyKWh',
+            'totalCost',
+            'days'
+        ));
     }
 
     public function exportExcel(Request $request)
@@ -51,7 +85,7 @@ class PumpHistoryController extends Controller
         }
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+            $query->whereBetween('start_time', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
         }
 
         $histories = $query->get();
@@ -59,7 +93,7 @@ class PumpHistoryController extends Controller
         $pdf = Pdf::loadView('content.kontrol.pump-history-pdf', compact('histories'));
         return $pdf->download('riwayat-pompa.pdf');
     }
-    
+
 
 
 }

@@ -9,17 +9,8 @@
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Jadwal Pompa Tandon</h5>
-            <label class="switch switch-primary">
-              <input type="checkbox" class="switch-input" id="scheduleTandonSwitch" name="is_active" checked>
-              <span class="switch-toggle-slider">
-                <span class="switch-on"></span><span class="switch-off"></span>
-              </span>
-            </label>
-          </div>
+          <h5 class="card-title mb-0">Jadwal Pompa Tandon</h5>
           <p class="text-secondary card-text">Air dari tandon ke tanaman hidroponik.</p>
-
           <form id="formScheduleTandon" class="mt-3">
             <div class="mb-3">
               <label for="tandonTime" class="form-label">Waktu Mulai</label>
@@ -54,15 +45,7 @@
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Jadwal Pompa Kolam</h5>
-            <label class="switch switch-primary">
-              <input type="checkbox" class="switch-input" id="scheduleKolamSwitch" name="is_active" checked>
-              <span class="switch-toggle-slider">
-                <span class="switch-on"></span><span class="switch-off"></span>
-              </span>
-            </label>
-          </div>
+          <h5 class="card-title mb-0">Jadwal Pompa Kolam</h5>
           <p class="text-secondary card-text">Mengisi air ke dalam kolam ikan.</p>
 
           <form id="formScheduleKolam" class="mt-3">
@@ -99,15 +82,7 @@
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Jadwal Pompa Buang</h5>
-            <label class="switch switch-primary">
-              <input type="checkbox" class="switch-input" id="scheduleBuangSwitch" name="is_active" checked>
-              <span class="switch-toggle-slider">
-                <span class="switch-on"></span><span class="switch-off"></span>
-              </span>
-            </label>
-          </div>
+          <h5 class="card-title mb-0">Jadwal Pompa Buang</h5>
           <p class="text-secondary card-text">Air dari kolam ke tanaman di bawah.</p>
 
           <form id="formScheduleBuang" class="mt-3">
@@ -164,15 +139,24 @@
                   <td>{{ $schedule->pump_name }}</td>
                   <td>{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}</td>
                   <td>{{ $schedule->duration_minutes }} menit</td>
-                            <td>{{ implode(', ', array_map(function($day) { return ['0' => 'Minggu', '1' => 'Senin', '2' => 'Selasa', '3' => 'Rabu', '4' => 'Kamis', '5' => 'Jumat', '6' => 'Sabtu', 'everyday' => 'Setiap Hari'][$day] ?? $day; }, $schedule->days)) }}</td>
                   <td>
-                    @if ($schedule->is_active)
-                      <span class="badge bg-label-success">Aktif</span>
-                    @else
-                      <span class="badge bg-label-secondary">Nonaktif</span>
-                    @endif
+                    {{ implode(', ',array_map(function ($day) {return ['0' => 'Minggu', '1' => 'Senin', '2' => 'Selasa', '3' => 'Rabu', '4' => 'Kamis', '5' => 'Jumat', '6' => 'Sabtu', 'everyday' => 'Setiap Hari'][$day] ?? $day;}, $schedule->days)) }}
                   </td>
-                  <td>{{-- Tombol Aksi (Edit/Hapus) --}}</td>
+                  <td>
+                    <button type="button"
+                            class="btn btn-sm badge toggle-status-btn {{ $schedule->status ? 'bg-label-success' : 'bg-label-secondary' }}"
+                            data-id="{{ $schedule->id }}">
+                      {{ $schedule->status ? 'Aktif' : 'Nonaktif' }}
+                    </button>
+                  </td>
+                  <td>
+                    <button type="button"
+                            class="btn btn-icon delete-schedule-btn"
+                            data-id="{{ $schedule->id }}"
+                            data-name="{{ $schedule->pump_name }} jam {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}">
+                      <i class='bx bx-trash'></i>
+                    </button>
+                  </td>
                 </tr>
               @empty
                 <tr>
@@ -189,6 +173,7 @@
 @endsection
 
 @section('page-script')
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   @vite(['resources/assets/vendor/libs/jquery/jquery.js', 'resources/assets/vendor/libs/select2/select2.js', 'resources/assets/vendor/libs/select2/select2.css'])
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -236,19 +221,19 @@
         const startTime = document.getElementById(pumpType.toLowerCase() + 'Time').value;
         const duration = document.getElementById(pumpType.toLowerCase() + 'Duration').value;
         const days = $(`#${pumpType.toLowerCase()}Days`).val();
-        const isActive = document.getElementById(`schedule${pumpType}Switch`).checked;
+
 
         const formData = {
           pump_name: pumpName,
           start_time: startTime,
           duration_minutes: duration,
           days: days,
-          is_active: isActive,
+          status: true,
           _token: '{{ csrf_token() }}' // Menambahkan CSRF token
         };
 
         // Kirim data ke server
-        fetch('{{ route('account-management.store') }}', {
+        fetch('{{ route('sistem-pump-schedule.store') }}', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -276,6 +261,121 @@
       document.getElementById('formScheduleTandon').addEventListener('submit', handleFormSubmit);
       document.getElementById('formScheduleKolam').addEventListener('submit', handleFormSubmit);
       document.getElementById('formScheduleBuang').addEventListener('submit', handleFormSubmit);
+      const deleteButtons = document.querySelectorAll('.delete-schedule-btn');
+
+      // 2. Beri event listener untuk setiap tombol
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const scheduleId = this.dataset.id;
+          const scheduleName = this.dataset.name;
+
+          // 3. Tampilkan konfirmasi
+          Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Anda akan menghapus jadwal: ${scheduleName}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // 4. Jika dikonfirmasi, kirim request DELETE
+              // Buat URL yang benar
+              let deleteUrl = '{{ route('sistem-pump-schedule.destroy', ['pumpSchedule' => '__ID__']) }}';
+              deleteUrl = deleteUrl.replace('__ID__', scheduleId);
+
+              fetch(deleteUrl, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+              })
+              .then(response => {
+                if (response.ok) {
+                  // 5. Jika sukses, reload halaman
+                  // (Sama seperti logika form 'create' Anda)
+                  window.location.reload();
+                } else {
+                  Swal.fire('Gagal!', 'Gagal menghapus jadwal.', 'error');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
+              });
+            }
+          });
+        });
+      });
+      
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+
+      // 1. Temukan semua tombol toggle status
+      const toggleButtons = document.querySelectorAll('.toggle-status-btn');
+
+      // 2. Beri event listener untuk setiap tombol
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const scheduleId = this.dataset.id;
+          const currentButton = this; // Simpan referensi ke tombol
+
+          // Buat URL
+          let toggleUrl = '{{ route('sistem-pump-schedule.toggleStatus', ['pumpSchedule' => '__ID__']) }}';
+          toggleUrl = toggleUrl.replace('__ID__', scheduleId);
+
+          // Kirim request PATCH
+          fetch(toggleUrl, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // 3. Update UI (tombol) tanpa reload halaman
+              const newStatus = data.new_status; // true atau false dari controller
+
+              if (newStatus) {
+                currentButton.textContent = 'Aktif';
+                currentButton.classList.remove('bg-label-secondary');
+                currentButton.classList.add('bg-label-success');
+              } else {
+                currentButton.textContent = 'Nonaktif';
+                currentButton.classList.remove('bg-label-success');
+                currentButton.classList.add('bg-label-secondary');
+              }
+
+              // Tampilkan notifikasi sukses
+              Toast.fire({
+                icon: 'success',
+                title: data.success
+              });
+
+            } else {
+              Swal.fire('Gagal!', data.error || 'Gagal mengubah status.', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
+          });
+        });
+      });
     });
   </script>
 @endsection
