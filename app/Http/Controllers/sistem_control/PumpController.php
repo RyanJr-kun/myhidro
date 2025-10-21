@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\sistem_control;
 
-use App\Models\sistem_control\Pump;
 use Illuminate\Http\Request;
+use App\Models\sistem_control\Pump;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class PumpController extends Controller
 {
@@ -13,54 +14,34 @@ class PumpController extends Controller
      */
     public function index()
     {
-        return view('content.kontrol.pump-control');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Pump $pump)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pump $pump)
-    {
-        //
+        $pumps = Pump::all();
+        return view('content.kontrol.pump-control', compact('pumps'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Pump $pump)
+    public function updateStatus(Request $request, Pump $pump)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|boolean',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pump $pump)
-    {
-        //
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Data tidak valid.'], 400);
+        }
+
+        try {
+            $pump->status = $request->status;
+            $pump->save();
+
+            $statusText = $pump->status ? 'dinyalakan' : 'dimatikan';
+            return response()->json([
+                'success' => true,
+                'message' => "{$pump->name} berhasil {$statusText}."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status pompa di database.'], 500);
+        }
     }
 }

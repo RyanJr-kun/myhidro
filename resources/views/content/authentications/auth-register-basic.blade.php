@@ -14,10 +14,9 @@
         <div class="card px-sm-6 px-0">
           <div class="card-body">
             <!-- Logo -->
-            <div class="app-brand justify-content-center mb-6">
-              <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                <span class="app-brand-logo demo">@include('_partials.macros')</span>
-                <span class="app-brand-text demo text-heading fw-bold">{{ config('variables.templateName') }}</span>
+            <div class="app-brand justify-content-center mb-n6">
+              <a href="{{ url('/') }}">
+                  <img src="{{ asset('assets/img/favicon/favicon.ico') }}" alt="" height="">
               </a>
             </div>
             <!-- /Logo -->
@@ -54,12 +53,12 @@
                   <div class="d-block invalid-feedback">{{ $message }}</div>
                 @enderror
               </div>
-              <button class="btn btn-primary d-grid w-100">Sign up</button>
+              <button class="btn btn-primary d-grid w-100">Mendaftar</button>
             </form>
             <p class="text-center">
               <span>Sudah punya akun?</span>
               <a href="{{ url('auth/login-basic') }}">
-                <span>Sign in</span>
+                <span>Login.</span>
               </a>
             </p>
           </div>

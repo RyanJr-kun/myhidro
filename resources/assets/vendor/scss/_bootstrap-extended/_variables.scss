@@ -67,6 +67,8 @@ $yellow: #ffab00 !default;
 $green: #71dd37 !default;
 $teal: #20c997 !default;
 $cyan: #03c3ec !default;
+$ijo: #61c134 !default;
+
 
 // scss-docs-end color-variables
 
@@ -78,7 +80,7 @@ $color-contrast-light: $white !default;
 $color-contrast-dark: $pure-black !default;
 
 // scss-docs-start theme-color-variables
-$primary: $purple !default;
+$primary: $ijo !default;
 $secondary: #8592a3 !default;
 $success: $green !default;
 $info: $cyan !default;

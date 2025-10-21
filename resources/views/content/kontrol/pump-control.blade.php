@@ -4,101 +4,143 @@
 
 @section('content')
   <div class="row">
-    {{-- Pompa Tandon Hidroponik --}}
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <h5 class="card-title mb-1">Pompa Tandon</h5>
-              <p class="text-secondary card-text">Air dari tandon ke tanaman hidroponik.</p>
-            </div>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="pumpTandonSwitch" />
-              <label class="form-check-label" for="pumpTandonSwitch"></label>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mt-2">
-            <i class='bx bxs-droplet-half fs-3 me-2 text-primary'></i>
-            <span id="pumpTandonStatus" class="badge bg-label-secondary">OFF</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    @php
+      $pumpIcons = [
+          'pompa hidroponik' => [
+              'icon' => 'bxs-water-drop-alt',
+              'color' => 'primary',
+              'description' => 'Air dari tandon ke tanaman hidroponik.',
+          ],
+          'pompa kolam' => [
+              'icon' => 'bxs-fish-alt',
+              'color' => 'info',
+              'description' => 'Mengisi air ke dalam kolam ikan.',
+          ],
+          'pompa pembuangan' => [
+              'icon' => 'bx-recycle',
+              'color' => 'success',
+              'description' => 'Air dari kolam ke tanaman di bawah.',
+          ],
+      ];
+    @endphp
 
-    {{-- Pompa Kolam Ikan --}}
-    <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <h5 class="card-title mb-1">Pompa Kolam</h5>
-              <p class="text-secondary card-text">Mengisi air ke dalam kolam ikan.</p>
+    @foreach ($pumps as $pump)
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="card-title mb-1 text-capitalize">{{ $pump->name }}</h5>
+                <p class="text-secondary card-text">
+                  {{ $pumpIcons[strtolower($pump->name)]['description'] ?? 'Kontrol pompa.' }}</p>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input pump-switch" type="checkbox" id="pumpSwitch-{{ $pump->id }}"
+                  data-id="{{ $pump->id }}" {{ $pump->status ? 'checked' : '' }} />
+                <label class="form-check-label" for="pumpSwitch-{{ $pump->id }}"></label>
+              </div>
             </div>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="pumpKolamSwitch" />
-              <label class="form-check-label" for="pumpKolamSwitch"></label>
+            <div class="d-flex align-items-center mt-2">
+              <i
+                class='bx {{ $pumpIcons[strtolower($pump->name)]['icon'] ?? 'bxs-toggle-right' }} fs-3 me-2 text-{{ $pumpIcons[strtolower($pump->name)]['color'] ?? 'secondary' }}'></i>
+              <span id="pumpStatus-{{ $pump->id }}"
+                class="badge {{ $pump->status ? 'bg-label-success' : 'bg-label-secondary' }}">{{ $pump->status ? 'ON' : 'OFF' }}</span>
             </div>
-          </div>
-          <div class="d-flex align-items-center mt-2">
-            <i class='bx bxs-fish fs-3 me-2 text-info'></i>
-            <span id="pumpKolamStatus" class="badge bg-label-secondary">OFF</span>
           </div>
         </div>
       </div>
-    </div>
-
-    {{-- Pompa Pembuangan --}}
-    <div class="col-md-4 mb-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <h5 class="card-title mb-1">Pompa Pembuangan</h5>
-              <p class="text-secondary card-text">Air dari kolam ke tanaman di bawah.</p>
-            </div>
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="pumpBuangSwitch" />
-              <label class="form-check-label" for="pumpBuangSwitch"></label>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mt-2">
-            <i class='bx bx-recycle fs-3 me-2 text-success'></i>
-            <span id="pumpBuangStatus" class="badge bg-label-secondary">OFF</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    @endforeach
   </div>
-
-  {{-- Di sini Anda bisa menambahkan script untuk interaksi dengan IoT --}}
 @endsection
 
 @section('page-script')
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Contoh interaksi untuk satu pompa, bisa diadaptasi untuk yang lain
-      const pumpTandonSwitch = document.getElementById('pumpTandonSwitch');
-      const pumpTandonStatus = document.getElementById('pumpTandonStatus');
+      const pumpSwitches = document.querySelectorAll('.pump-switch');
 
-      pumpTandonSwitch.addEventListener('change', function() {
-        const isChecked = this.checked;
-        if (isChecked) {
-          pumpTandonStatus.textContent = 'ON';
-          pumpTandonStatus.classList.remove('bg-label-secondary');
-          pumpTandonStatus.classList.add('bg-label-success');
-          // Di sini Anda akan mengirim perintah ke nodeMCU untuk menyalakan pompa
-          console.log('Mengirim perintah ON ke Pompa Tandon...');
+      pumpSwitches.forEach(pumpSwitch => {
+        pumpSwitch.addEventListener('change', function() {
+          const pumpId = this.dataset.id;
+          const status = this.checked;
+          const pumpStatusBadge = document.getElementById(`pumpStatus-${pumpId}`);
+
+          // Update UI secara optimis
+          updateUI(pumpStatusBadge, status);
+
+          // Kirim request ke server
+          fetch(`{{ route('sistem-pump-status', ['pump' => '__PUMP_ID__']) }}`.replace('__PUMP_ID__',
+              pumpId), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                  status: status ? 1 : 0
+                })
+              })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                showToast('success', data.message);
+                // Di sini Anda bisa mengirim perintah ke nodeMCU/IoT device
+                console.log(`Perintah untuk pompa ${pumpId} berhasil: ${status ? 'ON' : 'OFF'}`);
+              } else {
+                // Kembalikan UI ke state semula jika gagal
+                this.checked = !status;
+                updateUI(pumpStatusBadge, !status);
+                showToast('error', data.message || 'Gagal mengubah status pompa.');
+              }
+            })
+            .catch(error => {
+              // Kembalikan UI ke state semula jika terjadi error network
+              this.checked = !status;
+              updateUI(pumpStatusBadge, !status);
+              showToast('error', 'Terjadi kesalahan. Periksa koneksi Anda.');
+              console.error('Error:', error);
+            });
+        });
+      });
+
+      function updateUI(badge, status) {
+        if (status) {
+          badge.textContent = 'ON';
+          badge.classList.remove('bg-label-secondary');
+          badge.classList.add('bg-label-success');
         } else {
-          pumpTandonStatus.textContent = 'OFF';
-          pumpTandonStatus.classList.remove('bg-label-success');
-          pumpTandonStatus.classList.add('bg-label-secondary');
-          // Di sini Anda akan mengirim perintah ke nodeMCU untuk mematikan pompa
-          console.log('Mengirim perintah OFF ke Pompa Tandon...');
+          badge.textContent = 'OFF';
+          badge.classList.remove('bg-label-success');
+          badge.classList.add('bg-label-secondary');
+        }
+      }
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
         }
       });
 
-      // Anda bisa menambahkan event listener serupa untuk pumpKolamSwitch dan pumpBuangSwitch
+      function showToast(icon, title) {
+        Toast.fire({
+          icon: icon,
+          title: title
+        });
+      }
+
+      @if (session('success'))
+        showToast('success', '{{ session('success') }}');
+      @endif
+
+      @if (session('error'))
+        showToast('error', '{{ session('error') }}');
+      @endif
     });
   </script>
 @endsection

@@ -8,5 +8,24 @@ use Illuminate\Notifications\Notifiable;
 class Pump extends Model
 {
   use Notifiable;
-  protected $guarded = ['id'];
+  
+  /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'status',
+    ];
+
+    /**
+     * TAMBAHKAN INI
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'status' => 'boolean',
+    ];
 }

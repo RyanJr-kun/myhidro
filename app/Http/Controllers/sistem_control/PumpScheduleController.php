@@ -13,15 +13,8 @@ class PumpScheduleController extends Controller
      */
     public function index()
     {
-        return view('content.kontrol.pump-schedule');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $schedules = PumpSchedule::all();
+        return view('content.kontrol.pump-schedule', compact('schedules'));
     }
 
     /**
@@ -29,31 +22,20 @@ class PumpScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PumpSchedule $pumpSchedule)
-    {
-        //
-    }
+        $validatedData = $request->validate([
+            'pump_name' => 'required|string|max:255',
+            'start_time' => 'required|date_format:H:i',
+            'duration_minutes' => 'required|integer|min:1',
+            'days' => 'required|array',
+            'days.*' => 'string',
+            'is_active' => 'nullable|boolean',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PumpSchedule $pumpSchedule)
-    {
-        //
-    }
+        $validatedData['is_active'] = $request->has('is_active');
+        PumpSchedule::create($validatedData);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PumpSchedule $pumpSchedule)
-    {
-        //
+        return response()->json(['success' => 'Jadwal pompa berhasil disimpan!']);
     }
 
     /**
@@ -63,4 +45,4 @@ class PumpScheduleController extends Controller
     {
         //
     }
-}
+  }

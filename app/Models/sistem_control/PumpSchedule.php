@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PumpSchedule extends Model
 {
   use Notifiable;
-  protected $guarded = ['id'];
+
+  protected $fillable = [
+    'pump_name',
+    'start_time',
+    'duration_minutes',
+    'days',
+    'is_active',
+  ];
+  protected $casts = ['days' => 'array'];
 
 }

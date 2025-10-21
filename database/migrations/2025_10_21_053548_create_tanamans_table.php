@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pump_schedules', function (Blueprint $table) {
+        Schema::create('tanamans', function (Blueprint $table) {
             $table->id();
-            $table->string('pump_name');
-            $table->time('start_time');
-            $table->integer('duration_minutes');
-            $table->json('days');
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pump_schedules');
+        Schema::dropIfExists('tanamans');
     }
 };

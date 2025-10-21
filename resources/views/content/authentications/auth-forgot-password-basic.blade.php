@@ -15,39 +15,27 @@
           <div class="card-body">
             <!-- Logo -->
             <div class="app-brand justify-content-center mb-6">
-              <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                <span class="app-brand-logo demo">@include('_partials.macros')</span>
-                <span class="app-brand-text demo text-heading fw-bold">{{ config('variables.templateName') }}</span>
+              <a href="{{ url('/') }}">
+                  <img src="{{ asset('assets/img/favicon/favicon.ico') }}" alt="" height="">
               </a>
             </div>
             <!-- /Logo -->
-            <h4 class="mb-1">Forgot Password? 🔒</h4>
-            <p class="mb-6">Enter your email and we'll send you instructions to reset your password</p>
-
-            @if (session('status'))
-              <div class="alert alert-success" role="alert">
-                {{ session('status') }}
-              </div>
-            @endif
+            <h4 class="mb-1">Lupa Password? 🔒</h4>
+            <p class="mb-6">Masukan email dan kami akan mengirim instruksi untuk mengatur ulang kata sandi Anda.</p>
 
             <form id="formAuthentication" class="mb-6" action="{{ route('password.email') }}" method="POST">
               @csrf
               <div class="mb-6">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                  name="email" placeholder="Enter your email" value="{{ old('email') }}" required autofocus />
-                @error('email')
-                  <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                  </span>
-                @enderror
+                  name="email" placeholder="Masukan emailmu" value="{{ old('email') }}" required autofocus />
               </div>
-              <button class="btn btn-primary d-grid w-100">Send Reset Link</button>
+              <button class="btn btn-primary d-grid w-100">Kirim Ulang Link</button>
             </form>
             <div class="text-center">
               <a href="{{route('login') }}" class="d-flex justify-content-center">
                 <i class="icon-base bx bx-chevron-left me-1"></i>
-                Back to login
+                Kembali ke login
               </a>
             </div>
           </div>
@@ -56,4 +44,37 @@
       </div>
     </div>
   </div>
+@endsection
+
+@section('page-script')
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+
+      @if (session('status'))
+        Toast.fire({
+          icon: 'success',
+          title: '{{ session('status') }}'
+        });
+      @endif
+
+      @error('email')
+        Toast.fire({
+          icon: 'error',
+          title: '{{ $message }}'
+        });
+      @enderror
+    });
+  </script>
 @endsection

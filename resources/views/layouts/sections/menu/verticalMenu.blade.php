@@ -7,10 +7,9 @@ use Illuminate\Support\Facades\Gate;
     <!-- ! Hide app brand if navbar-full -->
     <div class="app-brand demo">
         <a href="{{url('/')}}" class="app-brand-link">
-            <span class="app-brand-logo demo">@include('_partials.macros')</span>
-            <span class="app-brand-text demo menu-text fw-bold ms-2">{{config('variables.templateName')}}</span>
+            <img src="{{ asset('assets/img/favicon/favicon.ico') }}" alt="" height="100px" class="ms-n9">
+            <span class="app-brand-text demo menu-text fw-bold ms-2">myhidro</span>
         </a>
-
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
             <i class="icon-base bx bx-chevron-left icon-sm d-flex align-items-center justify-content-center"></i>
         </a>
