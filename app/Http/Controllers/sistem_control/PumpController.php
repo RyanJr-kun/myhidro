@@ -82,7 +82,7 @@ class PumpController extends Controller
             $statusText = $pump->status ? 'dinyalakan' : 'dimatikan';
             return response()->json([
                 'success' => true,
-                'message' => "Status {$pump->name} berhasil diubah menjadi {$statusText}."
+                'message' => "{$pump->name} {$statusText}."
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Gagal memperbarui status pompa di database: ' . $e->getMessage()], 500);

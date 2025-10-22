@@ -33,11 +33,16 @@ Route::post('/auth/logout',[LoginBasic::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
 
   Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
-  Route::resource('/tanaman', TanamanController::class)->except('show','create','edit')->names([
-    'index' => 'dashboard-analytics-tanaman',
-    'create' => 'tanaman.create',
-    'store' => 'tanaman.store'
-  ]);
+  Route::resource('/tanaman', TanamanController::class)
+      ->except('show')
+      ->names([
+          'index' => 'dashboard-analytics-tanaman',
+          'create' => 'tanaman.create',
+          'store' => 'tanaman.store',
+          'edit' => 'tanaman.edit',
+          'update' => 'tanaman.update',
+          'destroy' => 'tanaman.destroy'
+      ]);
   Route::resource('/ikan', IkanController::class)->except('show','create','edit')->names([
     'index' => 'dashboard-analytics-ikan',
     'create' => 'ikan.create',

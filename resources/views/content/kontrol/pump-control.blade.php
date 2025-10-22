@@ -44,13 +44,13 @@
               <i
                 class='bx {{ $pumpIcons[strtolower($pump->name)]['icon'] ?? 'bxs-toggle-right' }} fs-3 me-2 text-{{ $pumpIcons[strtolower($pump->name)]['color'] ?? 'secondary' }}'></i>
               <span id="pumpStatus-{{ $pump->id }}"
-                class="badge {{ $pump->status ? 'bg-label-success' : 'bg-label-secondary' }}">{{ $pump->status ? 'ON' : 'OFF' }}</span>
+                class="badge me-2 {{ $pump->status ? 'bg-label-success' : 'bg-label-secondary' }}">{{ $pump->status ? 'ON' : 'OFF' }}</span>
+              @if (isset($automaticStates[strtolower($pump->name)]) && $automaticStates[strtolower($pump->name)])
+                <span class="badge bg-label-info me-2" title="Pompa seharusnya menyala sesuai jadwal otomatis.">
+                  <i class='bx bx-time-five me-1'></i> Jadwal Aktif
+                </span>
+              @endif
             </div>
-            @if (isset($automaticStates[strtolower($pump->name)]) && $automaticStates[strtolower($pump->name)])
-              <span class="badge bg-label-info me-2" title="Pompa seharusnya menyala sesuai jadwal otomatis.">
-                <i class='bx bx-time-five me-1'></i> Jadwal Aktif
-              </span>
-            @endif
             <div class="d-flex align-items-center mt-2">
               {{-- Indikator Jadwal Otomatis --}}
 

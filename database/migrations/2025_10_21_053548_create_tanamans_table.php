@@ -11,8 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tanamans', function (Blueprint $table) {
+        Schema::create('tanamen', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_tanaman');
+            $table->integer('jumlah_benih')->unsigned();
+            $table->dateTime('tanggal_tanam');
+            $table->integer('estimasi_panen_hari')->unsigned();
+            $table->dateTime('tanggal_panen_aktual')->nullable();
+            $table->enum('status', ['ditanam', 'dipanen', 'gagal'])->default('ditanam');
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
