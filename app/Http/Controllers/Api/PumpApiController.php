@@ -69,24 +69,37 @@ class PumpApiController extends Controller
         try {
             $pumpName = $validated['pump_name'];
 
-            if ($validated['status'] == 'ON') {
-                PumpHistory::create([
-                    'pump_name'    => $pumpName,
-                    'triggered_by' => 'Otomatis',
-                    'end_time' => null,
-                    'duration_in_seconds' => null
-                ]);
-            } else {
-                // Pompa baru saja Dimatikan
-                $history = PumpHistory::where('pump_name', $pumpName)
-                                    ->where('triggered_by', 'Otomatis')
-                                    ->whereNull('end_time') // Cari log 'ON' yang belum 'OFF'
-                                    ->latest('start_time')
-                                    ->first();
+            if ($validated['status'] == 'ON') { // Laporan Otomatis ON dari NodeMCU
+                // Cek dulu apakah ada sesi Manual yang sedang berjalan
+                $isManualRunning = PumpHistory::where('pump_name', $pumpName)
+                                              ->where('triggered_by', 'Manual')
+                                              ->whereNull('end_time')
+                                              ->exists(); // Cukup cek keberadaannya
 
-                if ($history) {
+                if (!$isManualRunning) {
+                    // Hanya buat sesi Otomatis jika TIDAK ada sesi Manual yang aktif
+                    PumpHistory::create([
+                        'pump_name'    => $pumpName,
+                        'triggered_by' => 'Otomatis',
+                        'end_time' => null,
+                        'duration_in_seconds' => null
+                    ]);
+                } else {
+
+                }
+            } else {
+                $openHistories = PumpHistory::where('pump_name', $pumpName)
+                                            ->whereNull('end_time')
+                                            ->get();
+
+                // Loop dan tutup semua entri yang terbuka
+                foreach ($openHistories as $history) {
                     $history->end_time = now();
-                    $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                    if ($history->start_time) {
+                        $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                    } else {
+                        $history->duration_in_seconds = 0; // Atau null
+                    }
                     $history->save();
                 }
             }
@@ -124,8 +137,7 @@ class PumpApiController extends Controller
         ]);
 
         $pumpName = $validated['pump_name'];
-        $userId = Auth::id(); // Ambil ID user yang login
-
+        $userId = Auth::id();
         $pump = Pump::where('name', $pumpName)->first();
         if (!$pump) {
             return response()->json(['success' => false, 'message' => 'Pompa tidak ditemukan.'], 404);
@@ -138,24 +150,46 @@ class PumpApiController extends Controller
         $pump->status = $newStatus;
         $pump->save();
 
-        // --- LOGIKA PENCATATAN RIWAYAT (MASALAH 2A) ---
-        if ($newStatus == true) { // Baru dinyalakan
+        // --- LOGIKA PENCATATAN RIWAYAT (VERSI PRIORITAS MANUAL) ---
+        if ($newStatus == true) { // Baru dinyalakan (Manual ON)
+            // 1. Tutup paksa sesi Otomatis yang mungkin sedang berjalan
+            $runningAutomatic = PumpHistory::where('pump_name', $pumpName)
+                                           ->where('triggered_by', 'Otomatis')
+                                           ->whereNull('end_time')
+                                           ->latest('start_time')
+                                           ->first();
+            if ($runningAutomatic) {
+                $runningAutomatic->end_time = now();
+                if ($runningAutomatic->start_time) {
+                    $runningAutomatic->duration_in_seconds = $runningAutomatic->start_time->diffInSeconds($runningAutomatic->end_time);
+                }
+                $runningAutomatic->save();
+                // Opsional: Log bahwa manual override terjadi
+                // \Log::info("Manual ON override closed Automatic session for pump: " . $pumpName);
+            }
+
+            // 2. Buat sesi Manual baru
             PumpHistory::create([
                 'pump_name'    => $pumpName,
                 'triggered_by' => 'Manual',
                 'end_time' => null,
                 'duration_in_seconds' => null
             ]);
-        } else { // Baru dimatikan
-            $history = PumpHistory::where('pump_name', $pumpName)
-                                ->where('triggered_by', 'Manual')
-                                ->whereNull('end_time')
-                                ->latest('start_time')
-                                ->first();
+        } else { // Baru dimatikan (Manual OFF)
+            // (Tetap gunakan logika "tutup semua" dari sebelumnya)
+            // Cari SEMUA entri riwayat untuk pompa ini yang belum selesai
+            $openHistories = PumpHistory::where('pump_name', $pumpName)
+                                        ->whereNull('end_time')
+                                        ->get();
 
-            if ($history) {
+            // Loop dan tutup semua entri yang terbuka
+            foreach ($openHistories as $history) {
                 $history->end_time = now();
-                $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                if ($history->start_time) {
+                    $history->duration_in_seconds = $history->start_time->diffInSeconds($history->end_time);
+                } else {
+                    $history->duration_in_seconds = 0; // Atau null
+                }
                 $history->save();
             }
         }

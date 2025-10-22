@@ -41,11 +41,11 @@
       </div>
     </div>
 
-    {{-- Card Jadwal pompa kolam --}}
+    {{-- Card Jadwal Pompa Kolam --}}
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal pompa kolam</h5>
+          <h5 class="card-title mb-0">Jadwal Pompa Kolam</h5>
           <p class="text-secondary card-text">Mengisi air ke dalam kolam ikan.</p>
 
           <form id="formScheduleKolam" class="mt-3">
@@ -71,18 +71,18 @@
               <input class="form-control" type="number" value="10" id="kolamDuration" placeholder="Contoh: 10" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="pompa kolam">
+            <input type="hidden" name="pump_name" value="Pompa Kolam">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
       </div>
     </div>
 
-    {{-- Card Jadwal pompa pembuangan --}}
+    {{-- Card Jadwal Pompa Pembuangan --}}
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal pompa pembuangan</h5>
+          <h5 class="card-title mb-0">Jadwal Pompa Buang</h5>
           <p class="text-secondary card-text">Air dari kolam ke tanaman di bawah.</p>
 
           <form id="formScheduleBuang" class="mt-3">
@@ -109,7 +109,7 @@
                 placeholder="Contoh: 20" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="pompa pembuangan">
+            <input type="hidden" name="pump_name" value="Pompa Buang">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
@@ -172,7 +172,6 @@
 
 @section('page-script')
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Inisialisasi Select2 untuk semua elemen dengan class .select2
