@@ -172,7 +172,7 @@
 
 @section('page-script')
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  @vite(['resources/assets/vendor/libs/jquery/jquery.js', 'resources/assets/vendor/libs/select2/select2.js', 'resources/assets/vendor/libs/select2/select2.css'])
+  
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Inisialisasi Select2 untuk semua elemen dengan class .select2
