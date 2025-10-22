@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IkanController;
 use App\Http\Controllers\TanamanController;
 use App\Http\Controllers\dashboard\Analytics;
-use App\Http\Controllers\Api\PumpApiController;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\pages\AccountSettingsAccount;
 use App\Http\Controllers\authentications\RegisterBasic;
@@ -16,20 +15,6 @@ use App\Http\Controllers\pages\AccountSettingsNotifications;
 use App\Http\Controllers\authentications\ForgotPasswordBasic;
 use App\Http\Controllers\sistem_control\PumpHistoryController;
 use App\Http\Controllers\sistem_control\PumpScheduleController;
-use App\Http\Middleware\VerifyDeviceToken;
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/pump/status', [PumpApiController::class, 'getManualStatusForWeb']);
-    Route::post('/pump/toggle', [PumpApiController::class, 'togglePumpStatus']);
-});
-
-// --- Rute untuk NodeMCU/Arduino ---
-// Rute ini diamankan dengan token khusus
-Route::middleware(VerifyDeviceToken::class)->group(function () {
-    Route::get('/arduino/get-desired-states', [PumpApiController::class, 'getDesiredStates']);
-    Route::post('/arduino/log-action', [PumpApiController::class, 'logArduinoPumpAction']);
-
-});
 
 // authentication
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('login')->middleware('guest');

@@ -5,11 +5,11 @@
 @section('content')
 
   <div class="row g-5">
-    {{-- Card Jadwal Pompa Tandon --}}
+    {{-- Card Jadwal pompa hidroponik --}}
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal Pompa Tandon</h5>
+          <h5 class="card-title mb-0">Jadwal pompa hidroponik</h5>
           <p class="text-secondary card-text">Air dari tandon ke tanaman hidroponik.</p>
           <form id="formScheduleTandon" class="mt-3">
             <div class="mb-3">
@@ -34,18 +34,18 @@
               <input class="form-control" type="number" value="15" id="tandonDuration" placeholder="Contoh: 15" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="Pompa Tandon">
+            <input type="hidden" name="pump_name" value="pompa hidroponik">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
       </div>
     </div>
 
-    {{-- Card Jadwal Pompa Kolam --}}
+    {{-- Card Jadwal pompa kolam --}}
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal Pompa Kolam</h5>
+          <h5 class="card-title mb-0">Jadwal pompa kolam</h5>
           <p class="text-secondary card-text">Mengisi air ke dalam kolam ikan.</p>
 
           <form id="formScheduleKolam" class="mt-3">
@@ -71,18 +71,18 @@
               <input class="form-control" type="number" value="10" id="kolamDuration" placeholder="Contoh: 10" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="Pompa Kolam">
+            <input type="hidden" name="pump_name" value="pompa kolam">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
       </div>
     </div>
 
-    {{-- Card Jadwal Pompa Pembuangan --}}
+    {{-- Card Jadwal pompa pembuangan --}}
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal Pompa Buang</h5>
+          <h5 class="card-title mb-0">Jadwal pompa pembuangan</h5>
           <p class="text-secondary card-text">Air dari kolam ke tanaman di bawah.</p>
 
           <form id="formScheduleBuang" class="mt-3">
@@ -109,7 +109,7 @@
                 placeholder="Contoh: 20" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="Pompa Buang">
+            <input type="hidden" name="pump_name" value="pompa pembuangan">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
@@ -144,16 +144,14 @@
                   </td>
                   <td>
                     <button type="button"
-                            class="btn btn-sm badge toggle-status-btn {{ $schedule->status ? 'bg-label-success' : 'bg-label-secondary' }}"
-                            data-id="{{ $schedule->id }}">
+                      class="btn btn-sm badge toggle-status-btn {{ $schedule->status ? 'bg-label-success' : 'bg-label-secondary' }}"
+                      data-id="{{ $schedule->id }}">
                       {{ $schedule->status ? 'Aktif' : 'Nonaktif' }}
                     </button>
                   </td>
                   <td>
-                    <button type="button"
-                            class="btn btn-icon delete-schedule-btn"
-                            data-id="{{ $schedule->id }}"
-                            data-name="{{ $schedule->pump_name }} jam {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}">
+                    <button type="button" class="btn btn-icon delete-schedule-btn" data-id="{{ $schedule->id }}"
+                      data-name="{{ $schedule->pump_name }} jam {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}">
                       <i class='bx bx-trash'></i>
                     </button>
                   </td>
@@ -283,34 +281,35 @@
             if (result.isConfirmed) {
               // 4. Jika dikonfirmasi, kirim request DELETE
               // Buat URL yang benar
-              let deleteUrl = '{{ route('sistem-pump-schedule.destroy', ['pumpSchedule' => '__ID__']) }}';
+              let deleteUrl =
+                '{{ route('sistem-pump-schedule.destroy', ['pumpSchedule' => '__ID__']) }}';
               deleteUrl = deleteUrl.replace('__ID__', scheduleId);
 
               fetch(deleteUrl, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-              })
-              .then(response => {
-                if (response.ok) {
-                  // 5. Jika sukses, reload halaman
-                  // (Sama seperti logika form 'create' Anda)
-                  window.location.reload();
-                } else {
-                  Swal.fire('Gagal!', 'Gagal menghapus jadwal.', 'error');
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
-              });
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                  }
+                })
+                .then(response => {
+                  if (response.ok) {
+                    // 5. Jika sukses, reload halaman
+                    // (Sama seperti logika form 'create' Anda)
+                    window.location.reload();
+                  } else {
+                    Swal.fire('Gagal!', 'Gagal menghapus jadwal.', 'error');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
+                });
             }
           });
         });
       });
-      
+
       const Toast = Swal.mixin({
         toast: true,
         position: 'bottom-end',
@@ -338,42 +337,42 @@
 
           // Kirim request PATCH
           fetch(toggleUrl, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              // 3. Update UI (tombol) tanpa reload halaman
-              const newStatus = data.new_status; // true atau false dari controller
-
-              if (newStatus) {
-                currentButton.textContent = 'Aktif';
-                currentButton.classList.remove('bg-label-secondary');
-                currentButton.classList.add('bg-label-success');
-              } else {
-                currentButton.textContent = 'Nonaktif';
-                currentButton.classList.remove('bg-label-success');
-                currentButton.classList.add('bg-label-secondary');
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
               }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // 3. Update UI (tombol) tanpa reload halaman
+                const newStatus = data.new_status; // true atau false dari controller
 
-              // Tampilkan notifikasi sukses
-              Toast.fire({
-                icon: 'success',
-                title: data.success
-              });
+                if (newStatus) {
+                  currentButton.textContent = 'Aktif';
+                  currentButton.classList.remove('bg-label-secondary');
+                  currentButton.classList.add('bg-label-success');
+                } else {
+                  currentButton.textContent = 'Nonaktif';
+                  currentButton.classList.remove('bg-label-success');
+                  currentButton.classList.add('bg-label-secondary');
+                }
 
-            } else {
-              Swal.fire('Gagal!', data.error || 'Gagal mengubah status.', 'error');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
-          });
+                // Tampilkan notifikasi sukses
+                Toast.fire({
+                  icon: 'success',
+                  title: data.success
+                });
+
+              } else {
+                Swal.fire('Gagal!', data.error || 'Gagal mengubah status.', 'error');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
+            });
         });
       });
     });

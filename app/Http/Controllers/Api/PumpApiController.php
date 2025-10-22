@@ -24,7 +24,7 @@ class PumpApiController extends Controller
         $manualStates = Pump::all()->pluck('status', 'name')->toArray();
 
         $automaticStates = [];
-        $activeSchedules = PumpSchedule::where('is_active', true)
+        $activeSchedules = PumpSchedule::where('status', true)
                             ->where(function ($query) use ($currentDay) {
                                 $query->whereJsonContains('days', $currentDay)
                                       ->orWhereJsonContains('days', 'everyday');
@@ -42,20 +42,19 @@ class PumpApiController extends Controller
             }
         }
 
-        $allPumpNames = ['Pompa Tandon', 'Pompa Kolam', 'Pompa Buang'];
+        $allPumpNames = ['pompa hidroponik', 'pompa kolam', 'pompa pembuangan'];
         $finalStates = [];
 
         foreach ($allPumpNames as $pumpName) {
             $isManualOn = $manualStates[$pumpName] ?? false;
             $isAutomaticOn = $automaticStates[$pumpName] ?? false;
 
-            // Status final adalah true (ON) jika salah satunya true
             $finalStates[$pumpName] = $isManualOn || $isAutomaticOn;
         }
 
         return response()->json([
             'success' => true,
-            'desired_states' => $finalStates, // Misal: {'Pompa Tandon': true, 'Pompa Kolam': false}
+            'desired_states' => $finalStates, // Misal: {'pompa hidroponik': true, 'pompa kolam': false}
             'timestamp' => $now
         ]);
     }
@@ -102,7 +101,7 @@ class PumpApiController extends Controller
     public function getManualStatusForWeb(Request $request)
     {
         $manualStates = Pump::all()->pluck('status', 'name')->toArray();
-        $allPumpNames = ['Pompa Tandon', 'Pompa Kolam', 'Pompa Buang']; // Sesuaikan
+        $allPumpNames = ['pompa hidroponik', 'pompa kolam', 'pompa pembuangan']; // Sesuaikan
 
         $pumpData = [];
         foreach ($allPumpNames as $pump) {
@@ -122,7 +121,7 @@ class PumpApiController extends Controller
     {
         $validated = $request->validate([
             // Asumsi frontend mengirim 'pump_name'
-            'pump_name' => 'required|string|in:Pompa Tandon,Pompa Kolam,Pompa Buang',
+            'pump_name' => 'required|string|in:pompa hidroponik,pompa kolam,pompa pembuangan',
             // Anda mungkin juga ingin mengirim 'status' (true/false) dari frontend
             // agar cocok dengan 'PumpController@updateStatus'
             // 'status' => 'required|boolean'

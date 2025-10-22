@@ -4,8 +4,10 @@ namespace App\Http\Controllers\sistem_control;
 
 use Illuminate\Http\Request;
 use App\Models\sistem_control\Pump;
+use App\Models\sistem_control\PumpSchedule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 use App\Models\sistem_control\PumpHistory;
 
 class PumpController extends Controller
@@ -16,7 +18,29 @@ class PumpController extends Controller
     public function index()
     {
         $pumps = Pump::all();
-        return view('content.kontrol.pump-control', compact('pumps'));
+
+        $now = Carbon::now();
+        $currentDay = (string)$now->dayOfWeek;
+        $currentTime = $now->format('H:i:s');
+
+        $automaticStates = [];
+        $activeSchedules = PumpSchedule::where('status', true)
+                            ->where(function ($query) use ($currentDay) {
+                                $query->whereJsonContains('days', $currentDay)
+                                      ->orWhereJsonContains('days', 'everyday');
+                            })->get();
+
+        foreach ($activeSchedules as $schedule) {
+            $startTime = $schedule->start_time;
+            $endTime = Carbon::parse($schedule->start_time)
+                             ->addMinutes($schedule->duration_minutes)
+                             ->format('H:i:s');
+
+            if ($currentTime >= $startTime && $currentTime <= $endTime) {
+                $automaticStates[$schedule->pump_name] = true;
+            }
+        }
+        return view('content.kontrol.pump-control', compact('pumps', 'automaticStates'));
     }
 
     /**

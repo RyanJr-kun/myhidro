@@ -45,7 +45,7 @@
 <div class="card mb-4">
   <h5 class="card-header">Estimasi Pemakaian Listrik</h5>
   <div class="card-body">
-    <p>Estimasi untuk rentang waktu **{{ $days }} hari** (sesuai filter tanggal Anda):</p>
+    <p>Estimasi untuk rentang waktu <span class="text-primary">{{ $days }} hari</span>&nbsp;(sesuai filter tanggal Anda):</p>
     <div class="row">
       <div class="col-md-6">
         <h6 class="text-primary">Total Pemakaian Energi</h6>

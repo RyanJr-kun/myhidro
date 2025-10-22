@@ -46,6 +46,15 @@
               <span id="pumpStatus-{{ $pump->id }}"
                 class="badge {{ $pump->status ? 'bg-label-success' : 'bg-label-secondary' }}">{{ $pump->status ? 'ON' : 'OFF' }}</span>
             </div>
+            @if (isset($automaticStates[strtolower($pump->name)]) && $automaticStates[strtolower($pump->name)])
+              <span class="badge bg-label-info me-2" title="Pompa seharusnya menyala sesuai jadwal otomatis.">
+                <i class='bx bx-time-five me-1'></i> Jadwal Aktif
+              </span>
+            @endif
+            <div class="d-flex align-items-center mt-2">
+              {{-- Indikator Jadwal Otomatis --}}
+
+            </div>
           </div>
         </div>
       </div>
@@ -71,15 +80,15 @@
           // Kirim request ke server
           fetch(`{{ route('sistem-pump-status', ['pump' => '__PUMP_ID__']) }}`.replace('__PUMP_ID__',
               pumpId), {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                  status: status ? 1 : 0
-                })
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify({
+                status: status ? 1 : 0
               })
+            })
             .then(response => response.json())
             .then(data => {
               if (data.success) {
