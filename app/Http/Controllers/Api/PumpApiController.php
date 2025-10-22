@@ -54,7 +54,7 @@ class PumpApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'desired_states' => $finalStates, // Misal: {'pompa hidroponik': true, 'pompa kolam': false}
+            'desired_states' => $finalStates,
             'timestamp' => $now
         ]);
     }
@@ -120,11 +120,7 @@ class PumpApiController extends Controller
     public function togglePumpStatus(Request $request)
     {
         $validated = $request->validate([
-            // Asumsi frontend mengirim 'pump_name'
             'pump_name' => 'required|string|in:pompa hidroponik,pompa kolam,pompa pembuangan',
-            // Anda mungkin juga ingin mengirim 'status' (true/false) dari frontend
-            // agar cocok dengan 'PumpController@updateStatus'
-            // 'status' => 'required|boolean'
         ]);
 
         $pumpName = $validated['pump_name'];
@@ -134,10 +130,6 @@ class PumpApiController extends Controller
         if (!$pump) {
             return response()->json(['success' => false, 'message' => 'Pompa tidak ditemukan.'], 404);
         }
-
-        // --- Logika Toggle ---
-        // Jika frontend mengirim status spesifik:
-        // $newStatus = $validated['status'];
 
         // Jika frontend hanya mengirim "toggle", maka kita balik statusnya:
         $newStatus = !$pump->status;
@@ -175,5 +167,41 @@ class PumpApiController extends Controller
             'message' => "Status {$pumpName} berhasil diubah menjadi {$statusText}.",
             'new_status' => $newStatus
         ]);
+    }
+
+    public function getSchedulesForArduino(Request $request)
+    {
+        try {
+            // Ambil semua jadwal yang aktif dari database
+            $schedules = PumpSchedule::where('is_active', true)
+                ->orderBy('pump_name') // Urutkan agar mudah dibaca (opsional)
+                ->orderBy('start_time')
+                ->get();
+
+            $formattedSchedules = [];
+            foreach ($schedules as $schedule) {
+                $daysString = implode(',', $schedule->days ?? []);
+
+                $formattedSchedules[] = [
+                    'nama_pompa'        => $schedule->pump_name, // Misal: "pompa hidroponik"
+                    'waktu_mulai'       => Carbon::parse($schedule->start_time)->format('H:i'), // Format HH:MM
+                    'durasi_menit'      => $schedule->duration_minutes,
+                    'hari'              => $daysString,
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data'    => $formattedSchedules,
+                'total'   => count($formattedSchedules),
+                'timestamp' => now()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data jadwal: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
