@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('ikans', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_ikan');
+            $table->integer('jumlah_bibit')->unsigned();
+            $table->dateTime('tanggal_tebar');
+            $table->integer('estimasi_panen_hari')->unsigned();
+            $table->dateTime('tanggal_panen_aktual')->nullable();
+            $table->enum('status', ['ditebar', 'dipanen', 'gagal'])->default('ditebar');
+            $table->integer('pekan_interval_jam')->nullable();
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }

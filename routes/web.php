@@ -43,11 +43,16 @@ Route::middleware(['auth'])->group(function () {
           'update' => 'tanaman.update',
           'destroy' => 'tanaman.destroy'
       ]);
-  Route::resource('/ikan', IkanController::class)->except('show','create','edit')->names([
-    'index' => 'dashboard-analytics-ikan',
-    'create' => 'ikan.create',
-    'store' => 'ikan.store'
-  ]);
+  Route::resource('/ikan', IkanController::class)
+      ->except('show')
+      ->names([
+        'index' => 'dashboard-analytics-ikan',
+        'create' => 'ikan.create',
+        'store' => 'ikan.store',
+        'edit' => 'ikan.edit',
+        'update' => 'ikan.update',
+        'destroy' => 'ikan.destroy'
+      ]);
 
   Route::get('/sistem-control/pump-control', [PumpController::class, 'index'])->name('sistem-pump-control');
   Route::post('/sistem-control/pump-status/{pump}', [PumpController::class, 'updateStatus'])->name('sistem-pump-status');

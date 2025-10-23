@@ -76,5 +76,9 @@ class Tanaman extends Model
             }
          );
     }
+    public function getRouteKeyName(): string
+    {
+        return 'nama_tanaman';
+    }
 
 }

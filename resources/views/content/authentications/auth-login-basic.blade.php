@@ -16,7 +16,7 @@
                     <!-- Logo -->
                     <div class="app-brand justify-content-center mb-n6">
                         <a href="{{ url('/') }}">
-                            <img src="{{ asset('assets/img/favicon/favicon.ico') }}" alt="" height="">
+                            <img src="{{ asset('assets/img/favicon/logo.png') }}" alt="" height="200px">
                         </a>
                     </div>
                     <!-- /Logo -->

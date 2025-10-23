@@ -18,6 +18,7 @@
       </li>
     </ul>
   </div>
+
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">Daftar Tanaman</h5>
@@ -83,8 +84,8 @@
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
                       class="bx bx-dots-vertical-rounded"></i></button>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item" href="{{ route('tanaman.edit', $tanaman->id) }}"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-                    <form action="{{ route('tanaman.destroy', $tanaman->id) }}" method="POST" class="delete-form">
+                    <a class="dropdown-item" href="{{ route('tanaman.edit', $tanaman->nama_tanaman) }}"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+                    <form action="{{ route('tanaman.destroy', $tanaman->nama_tanaman) }}" method="POST" class="delete-form">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="dropdown-item text-danger">
