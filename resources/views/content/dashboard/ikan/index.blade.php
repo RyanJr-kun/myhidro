@@ -48,7 +48,7 @@
           <tr>
             <td>{{ $ikans->firstItem() + $index }}</td>
             <td><strong>{{ $ikan->nama_ikan }}</strong></td>
-            <td>{{ $ikan->jumlah_benih }}</td>
+            <td>{{ $ikan->jumlah_bibit }}</td>
             <td>{{ $ikan->tanggal_tebar ? $ikan->tanggal_tebar->format('d M Y') : '-' }}</td>
             <td>
               @if ($ikan->estimasi_panen_hari)

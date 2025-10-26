@@ -71,7 +71,7 @@
               <input class="form-control" type="number" value="10" id="kolamDuration" placeholder="Contoh: 10" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="Pompa Kolam">
+            <input type="hidden" name="pump_name" value="pompa kolam">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
@@ -109,7 +109,7 @@
                 placeholder="Contoh: 20" />
             </div>
             {{-- Hidden input to identify the pump --}}
-            <input type="hidden" name="pump_name" value="Pompa Buang">
+            <input type="hidden" name="pump_name" value="pompa pembuangan">
             <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
           </form>
         </div>
