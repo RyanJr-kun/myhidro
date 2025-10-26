@@ -59,7 +59,7 @@ class PumpHistoryController extends Controller
         $costPerKWh = 1444;
         $totalCost = $totalEnergyKWh * $costPerKWh;
 
-        $histories = $query->paginate(10)->withQueryString();
+        $histories = $query->paginate(5)->withQueryString();
         $pumpOptions = ['pompa hidroponik', 'pompa kolam', 'pompa pembuangan'];
 
         return view('content.kontrol.pump-history',compact(

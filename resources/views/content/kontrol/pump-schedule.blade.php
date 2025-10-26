@@ -9,7 +9,7 @@
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal pompa hidroponik</h5>
+          <h5 class="card-title mb-0">Jadwal Pompa Hidroponik</h5>
           <p class="text-secondary card-text">Air dari tandon ke tanaman hidroponik.</p>
           <form id="formScheduleTandon" class="mt-3">
             <div class="mb-3">
@@ -82,7 +82,7 @@
     <div class="col-md-4 ">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-0">Jadwal Pompa Buang</h5>
+          <h5 class="card-title mb-0">Jadwal Pompa Pembuangan</h5>
           <p class="text-secondary card-text">Air dari kolam ke tanaman di bawah.</p>
 
           <form id="formScheduleBuang" class="mt-3">
