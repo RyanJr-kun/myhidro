@@ -151,7 +151,7 @@
 @section('page-script')
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {  
       const userModal = new bootstrap.Modal(document.getElementById('userModal'));
       const userForm = document.getElementById('userForm');
       const modalTitle = document.getElementById('modalTitle');

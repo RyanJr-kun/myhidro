@@ -3,115 +3,124 @@
 @section('title', 'Dashboard - Analytics')
 
 @section('vendor-style')
-@vite('resources/assets/vendor/libs/apex-charts/apex-charts.scss')
+  @vite('resources/assets/vendor/libs/apex-charts/apex-charts.scss')
 @endsection
 
 @section('vendor-script')
-@vite('resources/assets/vendor/libs/apex-charts/apexcharts.js')
+  @vite('resources/assets/vendor/libs/apex-charts/apexcharts.js')
 @endsection
 
 @section('page-script')
-@vite('resources/assets/js/dashboards-analytics.js')
+  @vite('resources/assets/js/dashboards-analytics.js')
 @endsection
 
 @section('content')
-<div class="nav-align-top">
-  <ul class="nav nav-pills flex-column flex-md-row mb-6 gap-md-0 gap-2">
-    <li class="nav-item">
-      <a class="nav-link active" href="javascript:void(0);"><i class="icon-base bx bx-dashboard icon-sm me-1_5"></i>
-        Dashboard</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{ route('dashboard-analytics-tanaman') }}"><i
-          class="icon-base bx bx-leaf icon-sm me-1_5"></i> Tanaman</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{ route('dashboard-analytics-ikan') }}"><i
-          class="icon-base bx bx-fish-alt icon-sm me-1_5"></i> Ikan</a>
-    </li>
-  </ul>
-</div>
-<div class="row">
+  <div class="nav-align-top">
+    <ul class="nav nav-pills flex-column flex-md-row mb-6 gap-md-0 gap-2">
+      <li class="nav-item">
+        <a class="nav-link active" href="javascript:void(0);"><i class="icon-base bx bx-dashboard icon-sm me-1_5"></i>
+          Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ route('dashboard-analytics-tanaman') }}"><i
+            class="icon-base bx bx-leaf icon-sm me-1_5"></i> Tanaman</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ route('dashboard-analytics-ikan') }}"><i
+            class="icon-base bx bx-fish-alt icon-sm me-1_5"></i> Ikan</a>
+      </li>
+    </ul>
+  </div>
+  <div class="row">
     <div class="col-12 mb-6 order-0">
-        <div class="card">
-            <div class="d-flex align-items-start row">
-                <div class="col-sm-7">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary mb-3">Selamat Datang {{ auth()->user()->name }} 🎉</h5>
-                        <p class="mb-6">Berikut adalah ringkasan data anda.<br />Cek notifikasi baru di profilemu</p>
-                        <a href="{{ url('pages/account-settings-notifications') }}" class="btn btn-sm btn-outline-primary">Lihat Notif</a>
-                    </div>
-                </div>
-                <div class="col-sm-5 text-center text-sm-left">
-                    <div class="card-body pb-0 px-0 px-md-6">
-                        <img src="{{ asset('assets/img/illustrations/man-with-laptop.png') }}" height="175" alt="View Badge User" />
-                    </div>
-                </div>
+      <div class="card">
+        <div class="d-flex align-items-start row">
+          <div class="col-sm-7">
+            <div class="card-body">
+              <h5 class="card-title text-primary mb-3">Selamat Datang {{ auth()->user()->name }} 🎉</h5>
+              <p class="mb-6">Berikut adalah ringkasan data anda.<br />Cek notifikasi baru di profilemu</p>
+              <a href="{{ url('pages/account-settings-notifications') }}" class="btn btn-sm btn-outline-primary">Lihat
+                Notif</a>
             </div>
+          </div>
+          <div class="col-sm-5 text-center text-sm-left">
+            <div class="card-body pb-0 px-0 px-md-6">
+              <img src="{{ asset('assets/img/illustrations/man-with-laptop.png') }}" height="175"
+                alt="View Badge User" />
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-    <!-- Total Revenue -->
+    <!-- Total Biaya Listrik -->
     <div class="col-12  order-2 order-md-3 order-xxl-2 mb-6 total-revenue">
-        <div class="card">
-            <div class="row row-bordered g-0">
-                <div class="col-lg-8">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <div class="card-title mb-0">
-                            <h5 class="m-0 me-2">Total Biaya Lisrik</h5>
-                        </div>
-                    </div>
-                    <div id="totalRevenueChart" class="px-3"></div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card-body px-xl-9 py-12 d-flex align-items-center flex-column">
-                        <div class="text-center mb-6">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-outline-primary">
-                                    Hidroponik
-                                </button>
-                                <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="visually-hidden">Toggle Dropdown</span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="javascript:void(0);">tanaman A</a></li>
-                                    <li><a class="dropdown-item" href="javascript:void(0);">tanaman B</a></li>
-                                    <li><a class="dropdown-item" href="javascript:void(0);">tanaman C</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div id="growthChart"></div>
-                        <div class="text-center fw-medium my-6">62% Tanaman Bertumbuh</div>
-
-                        <div class="d-flex gap-11 justify-content-between">
-                            <div class="d-flex">
-                                <div class="avatar me-2">
-                                    <span class="avatar-initial rounded-2 bg-label-primary"><i class="icon-base bx bx-dollar icon-lg text-primary"></i></span>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <small>Jumlah Tanaman</small>
-                                    <h6 class="mb-0">27 pot</h6>
-                                </div>
-                            </div>
-                            <div class="d-flex">
-                                <div class="avatar me-2">
-                                    <span class="avatar-initial rounded-2 bg-label-info"><i class="icon-base bx bx-wallet icon-lg text-info"></i></span>
-                                </div>
-                                <div class="d-flex flex-column">
-                                    <small>Jumlah Ikan</small>
-                                    <h6 class="mb-0">30 ekor</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div class="card">
+        <div class="row row-bordered g-0">
+          <div class="col-lg-8">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <div class="card-title mb-0">
+                <h5 class="m-0 me-2">Total Biaya Lisrik</h5>
+              </div>
             </div>
+            <div id="totalBiayaListrik" class="px-3"
+              data-labels='@json($chartLabels)'
+              data-standby-series='@json($chartBiayaStandby)'
+              data-pompa-series='@json($chartBiayaPompa)'>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card-body px-xl-9 py-12 d-flex align-items-center flex-column">
+             <div class="text-center mb-6">
+              <ul class="nav nav-pills nav-fill" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="growthBtnTanaman" type="button" role="tab">Tanaman</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="growthBtnIkan" type="button" role="tab">Ikan</button>
+                </li>
+              </ul>
+            </div>
+              <div id="growthChart"
+                  data-tanaman-growth="{{ $avgGrowthTanaman }}"
+                  data-ikan-growth="{{ $avgGrowthIkan }}">
+              </div>
+              <div class="text-center fw-medium my-6" id="growthChartLabel">Rata-rata Menuju Panen</div>
+
+              <div class="d-flex gap-11 justify-content-between">
+                <div class="d-flex">
+                  <div class="avatar me-2">
+                    {{-- Ganti ikon agar sesuai --}}
+                    <span class="avatar-initial rounded-2 bg-label-primary"><i
+                        class="icon-base bx bx-leaf icon-lg text-primary"></i></span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <small>Tanaman</small>
+                    {{-- Tampilkan data dinamis dari Controller --}}
+                    <h6 class="mb-0">{{ $totalTanaman ?? 0 }} Pot</h6>
+                  </div>
+                </div>
+                <div class="d-flex">
+                  <div class="avatar me-2">
+                    {{-- Ganti ikon agar sesuai --}}
+                    <span class="avatar-initial rounded-2 bg-label-info"><i
+                        class="icon-base bx bx-fish-alt icon-lg text-info"></i></span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <small>Ikan</small>
+                    {{-- Tampilkan data dinamis dari Controller --}}
+                    <h6 class="mb-0">{{ $totalIkan ?? 0 }} Ekor</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<div class="row">
+  </div>
+  <div class="row">
     <!-- Order Statistics -->
-    <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
+    {{-- <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between">
                 <div class="card-title mb-0">
@@ -197,11 +206,11 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!--/ Order Statistics -->
 
     <!-- Expense Overview -->
-    <div class="col-md-6 col-lg-4 order-1 mb-6">
+    {{-- <div class="col-md-6 col-lg-4 order-1 mb-6">
         <div class="card h-100">
             <div class="card-header nav-align-top">
                 <ul class="nav nav-pills flex-wrap row-gap-2" role="tablist">
@@ -248,11 +257,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!--/ Expense Overview -->
 
     <!-- Transactions -->
-    <div class="col-md-6 col-lg-4 order-2 mb-6">
+    {{-- <div class="col-md-6 col-lg-4 order-2 mb-6">
         <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="card-title m-0 me-2">Transactions</h5>
@@ -362,7 +371,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!--/ Transactions -->
-</div>
+  </div>
 @endsection

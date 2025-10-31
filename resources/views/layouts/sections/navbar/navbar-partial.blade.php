@@ -174,21 +174,11 @@
             <div class="dropdown-divider my-1"></div>
           </li>
           <li>
-            <a class="dropdown-item"
-              href="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/pages/profile-user">
+            <a class="dropdown-item" href="{{ route('account-settings') }}">
               <i class="icon-base bx bx-user icon-md me-3"></i><span>My Profile</span>
             </a>
           </li>
-          <li>
-            <a class="dropdown-item"
-              href="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/pages/account-settings-billing">
-              <span class="d-flex align-items-center align-middle">
-                <i class="flex-shrink-0 icon-base bx bx-credit-card icon-md me-3"></i>
-                <span class="flex-grow-1 align-middle">Billing Plan</span>
-                <span class="flex-shrink-0 badge rounded-pill bg-danger">4</span>
-              </span>
-            </a>
-          </li>
+
           <li>
             <form action="{{ route('logout') }}" method="post">
               @csrf

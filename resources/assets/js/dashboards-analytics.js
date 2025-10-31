@@ -106,251 +106,184 @@ document.addEventListener('DOMContentLoaded', function (e) {
     orderAreaChart.render();
   }
 
-  // Total Revenue Report Chart - Bar Chart
-  // --------------------------------------------------------------------
-  const totalRevenueChartEl = document.querySelector('#totalRevenueChart'),
-    totalRevenueChartOptions = {
-      series: [
-        {
-          name: new Date().getFullYear() - 1,
-          data: [18, 7, 15, 29, 18, 12, 9]
-        },
-        {
-          name: new Date().getFullYear() - 2,
-          data: [-13, -18, -9, -14, -8, -17, -15]
-        }
-      ],
-      chart: {
-        height: 300,
-        stacked: true,
-        type: 'bar',
-        toolbar: { show: false }
+  // ... (kode JS Anda yang lain) ...
+
+// --- Total Biaya Listrik (MODIFIED) ---
+// --------------------------------------------------------------------
+const totalBiayaListrikEl = document.querySelector('#totalBiayaListrik');
+
+// Pastikan elemennya ada sebelum lanjut
+if (typeof totalBiayaListrikEl !== 'undefined' && totalBiayaListrikEl !== null) {
+
+  // 1. Ambil data dari data-attributes HTML
+  const labels = JSON.parse(totalBiayaListrikEl.dataset.labels);
+  const standbySeries = JSON.parse(totalBiayaListrikEl.dataset.standbySeries);
+  const pompaSeries = JSON.parse(totalBiayaListrikEl.dataset.pompaSeries);
+
+  // 2. Opsi Chart (menggunakan data baru)
+  const totalBiayaListrikOptions = {
+    series: [
+      {
+        name: 'Biaya Pompa (Variabel)', // Ganti nama series
+        data: pompaSeries // Gunakan data dari controller
       },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '30%',
-          borderRadius: 8,
-          startingShape: 'rounded',
-          endingShape: 'rounded',
-          borderRadiusApplication: 'around'
-        }
+      {
+        name: 'Biaya Standby (Dasar)', // Ganti nama series
+        data: standbySeries // Gunakan data dari controller
+      }
+    ],
+    chart: {
+      height: 300,
+      stacked: true, // Ini sudah benar (stacked bar)
+      type: 'bar',
+      toolbar: { show: false }
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '30%',
+        borderRadius: 8,
+        startingShape: 'rounded',
+        endingShape: 'rounded',
+        borderRadiusApplication: 'around'
+      }
+    },
+    colors: [config.colors.primary, config.colors.info], // Warna untuk Pompa (primary) dan Standby (info)
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 6,
+      lineCap: 'round',
+      colors: [cardColor]
+    },
+    legend: {
+      show: true,
+      horizontalAlign: 'left',
+      position: 'top',
+      markers: {
+        size: 4,
+        radius: 12,
+        shape: 'circle',
+        strokeWidth: 0
       },
-      colors: [config.colors.primary, config.colors.info],
-      dataLabels: {
-        enabled: false
+      fontSize: '13px',
+      fontFamily: fontFamily,
+      fontWeight: 400,
+      labels: {
+        colors: legendColor,
+        useSeriesColors: false
       },
-      stroke: {
-        curve: 'smooth',
-        width: 6,
-        lineCap: 'round',
-        colors: [cardColor]
-      },
-      legend: {
-        show: true,
-        horizontalAlign: 'left',
-        position: 'top',
-        markers: {
-          size: 4,
-          radius: 12,
-          shape: 'circle',
-          strokeWidth: 0
-        },
-        fontSize: '13px',
-        fontFamily: fontFamily,
-        fontWeight: 400,
-        labels: {
-          colors: legendColor,
-          useSeriesColors: false
-        },
-        itemMargin: {
-          horizontal: 10
-        }
-      },
-      grid: {
-        strokeDashArray: 7,
-        borderColor: borderColor,
-        padding: {
-          top: 0,
-          bottom: -8,
-          left: 20,
-          right: 20
-        }
-      },
-      fill: {
-        opacity: [1, 1]
-      },
-      xaxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-        labels: {
-          style: {
-            fontSize: '13px',
-            fontFamily: fontFamily,
-            colors: labelColor
-          }
-        },
-        axisTicks: {
-          show: false
-        },
-        axisBorder: {
-          show: false
-        }
-      },
-      yaxis: {
-        labels: {
-          style: {
-            fontSize: '13px',
-            fontFamily: fontFamily,
-            colors: labelColor
-          }
+      itemMargin: {
+        horizontal: 10
+      }
+    },
+    grid: {
+      strokeDashArray: 7,
+      borderColor: borderColor,
+      padding: {
+        top: 0,
+        bottom: -8,
+        left: 20,
+        right: 20
+      }
+    },
+    fill: {
+      opacity: [1, 1]
+    },
+    xaxis: {
+      categories: labels, // <-- GANTI: Gunakan data label 6 bulan
+      labels: {
+        style: {
+          fontSize: '13px',
+          fontFamily: fontFamily,
+          colors: labelColor
         }
       },
-      responsive: [
-        {
-          breakpoint: 1700,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 10,
-                columnWidth: '35%'
-              }
-            }
-          }
+      axisTicks: {
+        show: false
+      },
+      axisBorder: {
+        show: false
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          fontSize: '13px',
+          fontFamily: fontFamily,
+          colors: labelColor
         },
-        {
-          breakpoint: 1440,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 12,
-                columnWidth: '43%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 1300,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 11,
-                columnWidth: '45%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 1200,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 11,
-                columnWidth: '37%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 1040,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 12,
-                columnWidth: '45%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 991,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 12,
-                columnWidth: '33%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 768,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 11,
-                columnWidth: '28%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 640,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 11,
-                columnWidth: '30%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 576,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 10,
-                columnWidth: '38%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 440,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 10,
-                columnWidth: '50%'
-              }
-            }
-          }
-        },
-        {
-          breakpoint: 380,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 9,
-                columnWidth: '60%'
-              }
-            }
-          }
-        }
-      ],
-      states: {
-        hover: {
-          filter: {
-            type: 'none'
-          }
-        },
-        active: {
-          filter: {
-            type: 'none'
-          }
+        // TAMBAHAN: Format Sumbu Y ke Rupiah
+        formatter: function (value) {
+          return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
         }
       }
-    };
-  if (typeof totalRevenueChartEl !== undefined && totalRevenueChartEl !== null) {
-    const totalRevenueChart = new ApexCharts(totalRevenueChartEl, totalRevenueChartOptions);
-    totalRevenueChart.render();
-  }
+    },
+    // TAMBAHAN: Format Tooltip ke Rupiah
+    tooltip: {
+        y: {
+            formatter: function (value) {
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+            }
+        }
+    },
+    responsive: [
+      // ... (blok responsive Anda sudah benar, tidak perlu diubah) ...
+      {
+        breakpoint: 1700,
+        options: {
+          plotOptions: {
+            bar: {
+              borderRadius: 10,
+              columnWidth: '35%'
+            }
+          }
+        }
+      },
+      // ... (dst) ...
+    ],
+    states: {
+      hover: {
+        filter: {
+          type: 'none'
+        }
+      },
+      active: {
+        filter: {
+          type: 'none'
+        }
+      }
+    }
+  };
+
+  // 3. Render Chart
+  const totalBiayaListrik = new ApexCharts(totalBiayaListrikEl, totalBiayaListrikOptions);
+  totalBiayaListrik.render();
+}
+
+  // dashboards-analytics.js
 
   // Growth Chart - Radial Bar Chart
   // --------------------------------------------------------------------
-  const growthChartEl = document.querySelector('#growthChart'),
-    growthChartOptions = {
-      series: [100],
+  const growthChartEl = document.querySelector('#growthChart');
+
+  if (typeof growthChartEl !== 'undefined' && growthChartEl !== null) {
+    // 1. Ambil data dari data-attributes
+    const avgGrowthTanaman = parseInt(growthChartEl.dataset.tanamanGrowth) || 0; // <--- PASTIKAN INI BENAR
+    const avgGrowthIkan = parseInt(growthChartEl.dataset.ikanGrowth) || 0;
+
+    // 2. Ambil elemen tombol
+    // INI ADALAH PERBAIKAN LOGIKA SELEKTOR
+    const mainGrowthButton = document.querySelector('#growthBtnTanaman'); // Tombol utama
+    const dropdownGrowthButton = document.querySelector('#growthBtnIkan'); // Tombol di dropdown
+    // 2. Ambil elemen tombol dan label
+    const growthChartLabel = document.querySelector('#growthChartLabel');
+
+    // 3. Opsi Awal Chart (untuk Tanaman)
+    const growthChartOptions = {
+      series: [avgGrowthTanaman], // Mulai dengan data Tanaman
       labels: ['Siap Panen'],
       chart: {
         height: 200,
@@ -387,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
           }
         }
       },
-      colors: [config.colors.primary],
+      colors: [config.colors.primary], // Mulai dengan warna Tanaman
       fill: {
         type: 'gradient',
         gradient: {
@@ -422,10 +355,53 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
       }
     };
-  if (typeof growthChartEl !== undefined && growthChartEl !== null) {
+
+    // 4. Render Chart Awal
     const growthChart = new ApexCharts(growthChartEl, growthChartOptions);
     growthChart.render();
-  }
+
+    // 5. Ambil Elemen Tombol (Logika Baru)
+    const growthBtnTanaman = document.querySelector('#growthBtnTanaman');
+    const growthBtnIkan = document.querySelector('#growthBtnIkan');
+
+    // 6. Event Listeners (Logika Baru)
+
+    // Listener untuk Tombol Tanaman
+    if (growthBtnTanaman) {
+      growthBtnTanaman.addEventListener('click', function () {
+        // 1. Update Chart
+        growthChart.updateOptions({
+          series: [avgGrowthTanaman],
+          colors: [config.colors.primary],
+          fill: { gradient: { gradientToColors: [config.colors.primary] } }
+        });
+        // 2. Update Label Teks
+        if (growthChartLabel) growthChartLabel.innerHTML = 'Rata-rata Pertumbuhan Tanaman';
+
+        // 3. Update Tampilan Tombol (CSS)
+        growthBtnTanaman.classList.add('active');
+        growthBtnIkan.classList.remove('active');
+      });
+    }
+
+    // Listener untuk Tombol Ikan
+    if (growthBtnIkan) {
+      growthBtnIkan.addEventListener('click', function () {
+        // 1. Update Chart
+        growthChart.updateOptions({
+          series: [avgGrowthIkan],
+          colors: [config.colors.info], // Ganti warna untuk Ikan
+          fill: { gradient: { gradientToColors: [config.colors.info] } }
+        });
+        // 2. Update Label Teks
+        if (growthChartLabel) growthChartLabel.innerHTML = 'Rata-rata Pertumbuhan Ikan';
+
+        // 3. Update Tampilan Tombol (CSS)
+        growthBtnIkan.classList.add('active');
+        growthBtnTanaman.classList.remove('active');
+      });
+    }
+  } // <-- Akhir dari blok "if (growthChartEl)"
 
   // Revenue Bar Chart
   // --------------------------------------------------------------------
@@ -688,8 +664,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
     statisticsChart.render();
   }
 
-  // Income Chart - Area chart
-  // --------------------------------------------------------------------
   const incomeChartEl = document.querySelector('#incomeChart'),
     incomeChartConfig = {
       series: [
